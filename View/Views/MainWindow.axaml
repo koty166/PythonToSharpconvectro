@@ -1,0 +1,67 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Kyrs.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="Kyrs.Views.MainWindow"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="Транслятор кода">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Window.Styles>
+      <StyleInclude Source="/Styles/Button.xaml"/>
+      <StyleInclude Source="/Styles/TextBox.xaml"/>
+    </Window.Styles>
+
+    <Grid x:Name="GR">
+        <Grid.Background>
+            <LinearGradientBrush EndPoint="50%,100%" StartPoint="50%,0%">
+                <GradientStop Color="#FF9DC797" Offset="0"/>
+                <GradientStop Color="#FFE09898" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+
+         <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        
+        <TextBox x:Name="TBSource" 
+            Grid.Row = "0" Grid.Column="0" 
+            Grid.RowSpan="2"
+            Classes="MyTBStyle" Margin="20,70,70,70"  HorizontalAlignment="Stretch" TextWrapping="NoWrap" Text="TextBox" AcceptsReturn="True" AcceptsTab="True" />
+        <TextBox x:Name="TBTarget"
+            Grid.Row = "0" Grid.Column="1"
+            Grid.RowSpan="2" 
+            Classes="MyTBStyle" Margin="70,70,20,70" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Text="TextBox"  AcceptsReturn="True" AcceptsTab="True" />
+    </Grid>
+
+        
+
+        <Label x:Name="LS" Content="Исходный код на Python" Margin="20,30,512,369" HorizontalContentAlignment="Left"/>
+        <Label x:Name="LT" Content="Целевой код на C# Результат трансляции" Margin="0,30,10,369" HorizontalContentAlignment="Right"/>
+        <!--Кнопки управления-->
+        <Button Content="Транслировать" Classes="btn" Click="Button_Click_2" Margin="342,368,342,10" HorizontalAlignment="Center" VerticalAlignment = "Bottom"/>  
+        <Button Content="Очистить" Classes="btn" Click="Button_Click"  Margin="20,369,0,10" HorizontalAlignment="Left" VerticalAlignment = "Bottom"/>
+        <Button Content="Очистить" Classes="btn" Click="Button_Click_1" Margin="0,369,20,10" HorizontalAlignment="Right" VerticalAlignment = "Bottom" />
+        <!--________________________________________-->
+        <Menu Height="25" VerticalAlignment="Top">
+            <MenuItem Header="Темы" Height="24" Width="50" HorizontalAlignment="Center" FontStyle="Normal" FontFamily="Algerian" FontWeight="Normal">
+                <Button x:Name="Dark" Content="Dark" FontFamily="Segoe UI Black" Click="MenuItem_Click"/>
+                <Button x:Name="Blue" Content="Blue" FontFamily="Segoe UI Black" Click="MenuItem_Click_1" />
+                <Button x:Name="White" Content="White" FontFamily="Segoe UI Black" Click="MenuItem_Click_2" />
+                <Button x:Name="Default" Content="Default" FontFamily="Segoe UI Black" Click="Default_Click" />
+            </MenuItem>
+        </Menu>
+    </Grid>
+
+</Window>

@@ -1,0 +1,24 @@
+<Styles
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Kyrs.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+
+    <Style Selector="TextBox.MyTBStyle /template/ ContentPresenter">
+            <Setter Property="CornerRadius" Value="15,15,15,15" />
+        </Style>
+        <Style Selector="TextBox.MyTBStyle">
+            <Setter Property="Background" Value="#FFF1E2CF"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+
+        </Style>
+        <Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement">
+            <Setter Property="BorderBrush" Value="#FFF1E2CF"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+        </Style>
+        <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+           <Setter Property="Background" Value="#fff3be85"/>
+           <Setter Property="BorderBrush" Value="#fff3be85"/>
+        </Style>
+</Styles>
