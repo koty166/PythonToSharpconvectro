@@ -1,0 +1,126 @@
+{
+  "format": 1,
+  "restore": {
+    "/home/kot/Inf/avolonia/Kyrs/CLI/CLI.csproj": {}
+  },
+  "projects": {
+    "/home/kot/Inf/avolonia/Kyrs/CLI/CLI.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/kot/Inf/avolonia/Kyrs/CLI/CLI.csproj",
+        "projectName": "CLI",
+        "projectPath": "/home/kot/Inf/avolonia/Kyrs/CLI/CLI.csproj",
+        "packagesPath": "/home/kot/.nuget/packages/",
+        "outputPath": "/home/kot/Inf/avolonia/Kyrs/CLI/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/kot/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "/home/kot/Inf/avolonia/Kyrs/TranslateLibrary/TranslateLibrary.csproj": {
+                "projectPath": "/home/kot/Inf/avolonia/Kyrs/TranslateLibrary/TranslateLibrary.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/home/kot/.dotnet/sdk/6.0.201/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/home/kot/Inf/avolonia/Kyrs/TranslateLibrary/TranslateLibrary.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/home/kot/Inf/avolonia/Kyrs/TranslateLibrary/TranslateLibrary.csproj",
+        "projectName": "TranslateLibrary",
+        "projectPath": "/home/kot/Inf/avolonia/Kyrs/TranslateLibrary/TranslateLibrary.csproj",
+        "packagesPath": "/home/kot/.nuget/packages/",
+        "outputPath": "/home/kot/Inf/avolonia/Kyrs/TranslateLibrary/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/home/kot/.nuget/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "DynamicLanguageRuntime": {
+              "target": "Package",
+              "version": "[1.3.1, )"
+            },
+            "IronPython": {
+              "target": "Package",
+              "version": "[2.7.12, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/home/kot/.dotnet/sdk/6.0.201/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

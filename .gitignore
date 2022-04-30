@@ -1,0 +1,11 @@
+
+CLI/bin/Debug/
+
+
+CLI/obj/Debug/net6.0/
+
+*.dll
+
+*.pdb
+
+*.cache
