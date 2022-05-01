@@ -1,11 +1,13 @@
 
 CLI/bin/Debug/
-
+TranslateLibrary/bin/Debug/
 
 CLI/obj/Debug/net6.0/
-
+TranslateLibrary/obj/Debug/net6.0/
 *.dll
 
 *.pdb
 
 *.cache
+TranslateLibrary/obj/Debug/net6.0/TranslateLibrary.dll
+TranslateLibrary/bin/Debug/net6.0/TranslateLibrary.pdb

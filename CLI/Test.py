@@ -1,11 +1,12 @@
 import re
-data.class = open("FIO").read() + 0
+data.class = open("FIO","test").read() + 0
 i = 0
+k = (16 * (5+2)) - b * c * (u in g) + n * i
 out = ""
 for j in (data.split("\n")):
 	if(j == ""):
 		continue
-	if(i == 4):
+	if i == 4:
 		i = 0
 		print(out)
 		out=""

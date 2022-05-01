@@ -14,6 +14,11 @@ public enum NodeTypes:byte
     IMPORT,
     START,
     END,
-    CONTINUE
+    CONTINUE,
+    IF,
+    FOR,
+    WHILE,
+    BREAK,
+    RETURN
 
 }

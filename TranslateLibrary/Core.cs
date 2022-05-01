@@ -3,6 +3,7 @@ using IronPython;
 using IronPython.Modules;
 using Microsoft.Scripting.Hosting;
 
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace TranslateLibrary;
@@ -24,23 +25,36 @@ public class Core
         return string.Empty;
         
     }
-    static string[] Split(String s,char[] Separator, int MaxReturns,out char? RSeparator, StringSplitOptions SplitOption = StringSplitOptions.None)
+    //Можеит заменить на список регулярок?
+    static string[] ImportantPreferenses = new string[] {"=","+=","-=","*=","/=","==","+","-","*","/","in","."};
+    static int GetMostImportantMatchNumber(MatchCollection mc)
     {
-        string[] SubStrings = new string[0];
-        foreach (var item in Separator)
+        foreach (var item in ImportantPreferenses)
+            for (int i = 0; i < mc.Count; i++)
+                if(mc[i].Value == item)
+                    return i;
+        return 0;
+    }
+    static string[] Split(String s,out string? RSeparator)
+    {
+        Regex r = new Regex(@"[=*\/+-.]+| in ");
+
+        string[] SubStrings =  r.Split(s);
+        if(SubStrings.Length <= 1)
         {
-            if(!s.Contains(item))
-                continue;
-            SubStrings  = s.Split(item,MaxReturns,SplitOption);
-            if(SubStrings.Length != 0)
-            {
-                RSeparator = item;
-                return SubStrings;
-            }
-            
+            RSeparator = null;
+            return new string[]{s};
         }
-        RSeparator = null;
-        return new string[]{s};
+        MatchCollection Separators = r.Matches(s);
+        int MostImportantSeparator = GetMostImportantMatchNumber(Separators);
+
+        RSeparator = Separators[MostImportantSeparator].Value;
+
+        string LeftRes = s.Substring(0,Separators[MostImportantSeparator].Index);
+        string RightRes = s.Substring(Separators[MostImportantSeparator].Index + Separators[MostImportantSeparator].Length);
+
+
+        return new string[] {LeftRes,RightRes};
     }
     static List<MyVar> Vars = new List<MyVar>();
     static  List<MyFunc> Funcs = new List<MyFunc>();
@@ -86,6 +100,35 @@ public class Core
         }   
         return NodeType;
     }
+    static List<string> BrecketsColl = new List<string>();
+    public static void RepaceBreckets(ref string Line)
+    {
+        string LocalCopyOfTheLine = Line;
+        int CurrBrecketsCollIndex = BrecketsColl.Count - 1;
+
+        List<int> OpenedBrecketsIndexes = new List<int>();
+        for (int i = 0; i < Line.Length; i++)
+        {
+            char c = Line[i];
+            if(Line[i] == '(')
+                OpenedBrecketsIndexes.Add(i);
+            else if(Line[i]== ')')
+            {
+                if(OpenedBrecketsIndexes.Count == 0)
+                {
+                    Console.WriteLine("ERROR");
+                    continue;
+                }
+
+                CurrBrecketsCollIndex++;
+                string BufSubLine = Line.Substring(OpenedBrecketsIndexes.Last(),i - OpenedBrecketsIndexes.Last() +1);
+                Line = Line.Replace(BufSubLine,$"#{CurrBrecketsCollIndex}");
+                BrecketsColl.Add(BufSubLine);
+                OpenedBrecketsIndexes.RemoveAt(OpenedBrecketsIndexes.Count-1);
+                i-= BufSubLine.Length;
+            }
+        }
+    }
     /// <summary>
     /// Построение древа для линейного выражения.
     /// </summary>
@@ -93,41 +136,65 @@ public class Core
     /// <param name="IsLeft"></param>
     /// <param name="ParentUID"></param>
     /// <returns></returns>
-    public static Node SeparateLinear(string Line, bool IsLeft,int i, Int64 ParentUID)
-    {
-        char[] Separators = "=*/+-.".ToCharArray();
-        string[] Sublines = Split(Line,Separators,2, out char? RSeparator,StringSplitOptions.TrimEntries);
+    public static Node SeparateLinear(string Line,int CurGlobalNDPos, Int64 ParentUID)
+    {   
 
+        Node CurNode = new Node(GetUID(),ParentUID);
 
-        Node CurNode = new Node();
-        CurNode.ParentUID = ParentUID;
-        CurNode.UID = GetUID();
-        
+        if(Line == String.Empty)
+        {
+            CurNode.NodeType = NodeTypes.NONE;
+            return CurNode;
+        }
+        string[] Sublines = Split(Line,out string? RSeparator);
+        if(Sublines.Length == 1 && Sublines[0].StartsWith('#'))
+        {
+            int BracketCollIndex = int.Parse(Sublines[0].TrimStart('#'));
+            string NormalazedLine = BrecketsColl[BracketCollIndex].Trim("()".ToCharArray());
+            return SeparateLinear(NormalazedLine,CurGlobalNDPos,ParentUID);
+        }
+
         if(RSeparator != null)
         {
             CurNode.NodeType = NodeTypes.CALL;
-            CurNode.Target = RSeparator.ToString();
+            CurNode.Target = RSeparator;
         }
-        if(RSeparator ==  '=')
+        if(RSeparator ==  "=")
         {
             CurNode.NodeType = NodeTypes.EQUALS;
-            CurNode.Target = null;
+            CurNode.Target = String.Empty;
         }
         
-        Node FirstChild = null, SecoundChild = null;
+        Node? FirstChild = null, SecoundChild = null;
         if(Sublines.Length != 1)
         {
-            FirstChild = SeparateLinear(Sublines[0].Trim(),true,i,CurNode.UID);
-            SecoundChild = SeparateLinear(Sublines[1].Trim(),false,i, CurNode.UID);
+            FirstChild = SeparateLinear(Sublines[0].Trim(),CurGlobalNDPos,CurNode.UID);
+            SecoundChild = SeparateLinear(Sublines[1].Trim(),CurGlobalNDPos, CurNode.UID);
+            CurNode.ChildNodes = new Node[]{FirstChild,SecoundChild};
         }
         else
         {
+            Match FuncCallRegexResault = Regex.Match(Sublines[0],@"#[\d]+");
+            if(FuncCallRegexResault.Value != String.Empty)
+            {
+                int BracketCollIndex = int.Parse(FuncCallRegexResault.Value.TrimStart('#'));
+                string[] Params = BrecketsColl[BracketCollIndex].Trim("()".ToCharArray()).Split(',');
+
+                CurNode.NodeType = NodeTypes.CALL;
+                CurNode.Target = Sublines[0].Substring(0,FuncCallRegexResault.Index);
+                CurNode.ChildNodes = new Node[Params.Length];
+
+                ND[CurGlobalNDPos].Nodes.Add(CurNode);
+
+                for (int i = 0; i < Params.Length; i++)
+                    CurNode.ChildNodes[i] = SeparateLinear(Params[i].Trim(),CurGlobalNDPos,CurNode.UID);
+                return CurNode;
+            }
             CurNode.ChildNodes = null;
             CurNode.Target = Sublines[0];
             CurNode.NodeType = GetNodeType(ref CurNode.Target);
         }
-        ND[i].Nodes.Add(CurNode);
-        CurNode.ChildNodes = new Node[]{FirstChild,SecoundChild};
+        ND[CurGlobalNDPos].Nodes.Add(CurNode);
         return CurNode;
     }
     static string[] Normalazing(string[] SourceCodeLines)
@@ -144,68 +211,86 @@ public class Core
             CurTabsNum = TabsNum;
             if(Lines[i].Contains('#'))
                 Lines.RemoveAt(i);
+            Lines[i] = Lines[i].Trim();
         }
         return Lines.ToArray();
     }
-   
-    public static String GetTokenizatedText(string SourceCode)
+    
+    static Node IfConstructionSeparator(string Line,int CurGlobalNDPos, Int64 ParentUID)
+    {
+        string NormalizedIfConstruction = Regex.Match(Line,@"(?<=if)[( ]?[\w\W]+[) ]?(?=:)").Value.Trim("() ".ToCharArray());
+        Node CurNode =  new Node(GetUID(),ParentUID,NodeTypes.IF);
+        ND[CurGlobalNDPos].Nodes.Add(CurNode);
+        CurNode.ChildNodes = new Node[1];
+        CurNode.ChildNodes[0] = SeparateLinear(NormalizedIfConstruction,CurGlobalNDPos,CurNode.UID);
+        return CurNode;
+    }
+    static Node ForConstructionSeparator(string Line,bool IsFor,int CurGlobalNDPos, Int64 ParentUID)
+    {
+        Node CurNode =  new Node(GetUID(),ParentUID);
+        
+        string NormalizedIfConstruction = String.Empty;
+        if(IsFor)
+        {
+            NormalizedIfConstruction = Regex.Match(Line,@"(?<=for)[( ]?[\w\W]+[) ]?(?=:)").Value.Trim("() ".ToCharArray());
+            CurNode.NodeType = NodeTypes.FOR;
+        }
+        else
+        {
+            NormalizedIfConstruction = Regex.Match(Line,@"(?<=while)[( ]?[\w\W]+[) ]?(?=:)").Value.Trim("() ".ToCharArray());
+            CurNode.NodeType = NodeTypes.WHILE;
+        }
+        CurNode.ChildNodes = new Node[1];
+        CurNode.ChildNodes[0] = SeparateLinear(NormalizedIfConstruction,CurGlobalNDPos,CurNode.UID);
+        ND[CurGlobalNDPos].Nodes.Add(CurNode);
+
+        return CurNode;
+    }
+    public static void GetTokenizatedText(string SourceCode)
     {
         string[] Lines = SourceCode.Split("\n",StringSplitOptions.RemoveEmptyEntries);
         Lines = Normalazing(Lines);
+
         for (int i = 0; i < Lines.Length; i++)
         {
             Lines[i] = Lines[i].Trim();
             ND.Add(new NodeTree());
-
-            if
+            RepaceBreckets(ref Lines[i]);
+            if(Lines[i].StartsWith("if"))
+            {
+                IfConstructionSeparator(Lines[i],i,i);
+                continue;
+            }
+            else if(Lines[i].StartsWith("for"))
+            {
+                ForConstructionSeparator(Lines[i],true,i,i);
+                continue;
+            }
+            else if(Lines[i].StartsWith("while"))
+            {
+                ForConstructionSeparator(Lines[i],false,i,i);
+                continue;
+            }
             switch(Lines[i])
             {
                 case "START":
-                    ND[i].Nodes.Add(new Node(){NodeType=NodeTypes.START, Target = ""});
+                    ND[i].Nodes.Add(new Node(NodeTypes.START));
                     break;
                 case "END":
-                    ND[i].Nodes.Add(new Node(){NodeType=NodeTypes.END, Target = ""});
+                    ND[i].Nodes.Add(new Node(NodeTypes.END));
                     break;
                 case "continue":
-                    ND[i].Nodes.Add(new Node(){NodeType=NodeTypes.CONTINUE, Target = ""});
+                    ND[i].Nodes.Add(new Node(NodeTypes.CONTINUE));
+                    break;
+                case "break":
+                    ND[i].Nodes.Add(new Node(NodeTypes.BREAK));
                     break;
                 default:
-                    SeparateLinear(Lines[i],false,i,i);
+                    SeparateLinear(Lines[i],i,i);
                     break;
-            }                
+            }
+            BrecketsColl.Clear();                
         }
-        return null;
     }
-    /*public static String GetTokenizatedText(string SourceCode)
-    {
-        List<MyVar> Vars;
-        List<MyFunc> Funcs;
-        SourceCode+="\n";// Костыль
-        Vars = new List<MyVar>();
-        Funcs = new List<MyFunc>();
 
-        SourceCode = Regex.Replace(SourceCode,"import [\\w.]+", (Match m) =>
-                                                            {
-                                                                string[] words = m.Value.Split(' ');
-                                                                return "IMPORT("+words[1]+")";
-                                                            });
-
-        SourceCode = Regex.Replace(SourceCode,"[\\d\\w +-\\/*]+=(?!=).+[\n\0]", (Match m) =>
-                                                            {
-                                                                string[] words = m.Value.Split('=');
-                                                                MatchCollection paramss = Regex.Matches(words[1],"\".+[\\d\\w]+.+\"");
-                                                                string bufs = Regex.Replace(words[1].Trim(),"\".+[\\d\\w]+.+\"","^");
-
-                                                                bufs = Regex.Replace(bufs,"[\\d\\w]+",(Match m) => "CALL("+m.Value+")");
-                                                                bufs = Regex.Replace(bufs,"\\.+","SUB");
-                                                                int n = 0;
-                                                                bufs = Regex.Replace(bufs,"\\(\\^\\)",(Match m) => "PARAMS("+paramss[n++].Value+")");
-                                                                bufs =bufs.Replace("()","");
-                                                                return "NVAR("+words[0].Trim()+")" + "EQUALS"+bufs+"\n";
-                                                            });
-        return SourceCode;
-    }*/
 }
-// regex^
-// [\d\w]+\([\S ]*\) - функция, включая if
-// [\d\w +-\/*]+=(?!=) - присвавание
