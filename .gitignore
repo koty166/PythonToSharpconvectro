@@ -11,3 +11,5 @@ TranslateLibrary/obj/Debug/net6.0/
 *.cache
 TranslateLibrary/obj/Debug/net6.0/TranslateLibrary.dll
 TranslateLibrary/bin/Debug/net6.0/TranslateLibrary.pdb
+
+CLI/outTEst.txt
