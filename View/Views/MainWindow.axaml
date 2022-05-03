@@ -38,10 +38,12 @@
         <TextBox x:Name="TBSource" 
             Grid.Row = "0" Grid.Column="0" 
             Grid.RowSpan="2"
+            FontSize="16" FontFamily="Arial"
             Classes="MyTBStyle" Margin="20,70,70,70"  HorizontalAlignment="Stretch" TextWrapping="NoWrap" Text="TextBox" AcceptsReturn="True" AcceptsTab="True" />
         <TextBox x:Name="TBTarget"
             Grid.Row = "0" Grid.Column="1"
             Grid.RowSpan="2" 
+            FontSize="16" FontFamily="Arial"
             Classes="MyTBStyle" Margin="70,70,20,70" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Text="TextBox"  AcceptsReturn="True" AcceptsTab="True" />
     </Grid>
 
@@ -50,16 +52,16 @@
         <Label x:Name="LS" Content="Исходный код на Python" Margin="20,30,512,369" HorizontalContentAlignment="Left"/>
         <Label x:Name="LT" Content="Целевой код на C# Результат трансляции" Margin="0,30,10,369" HorizontalContentAlignment="Right"/>
         <!--Кнопки управления-->
-        <Button Content="Транслировать" Classes="btn" Click="Button_Click_2" Margin="342,368,342,10" HorizontalAlignment="Center" VerticalAlignment = "Bottom"/>  
-        <Button Content="Очистить" Classes="btn" Click="Button_Click"  Margin="20,369,0,10" HorizontalAlignment="Left" VerticalAlignment = "Bottom"/>
-        <Button Content="Очистить" Classes="btn" Click="Button_Click_1" Margin="0,369,20,10" HorizontalAlignment="Right" VerticalAlignment = "Bottom" />
+        <Button x:Name="Translate" Content="Транслировать" Classes="btn" Click="Translate_Click" Margin="342,368,342,10" HorizontalAlignment="Center" VerticalAlignment = "Bottom"/>  
+        <Button x:Name="SourceClear" Content="Очистить" Classes="btn" Click="SourceClear_Click"  Margin="20,369,0,10" HorizontalAlignment="Left" VerticalAlignment = "Bottom"/>
+        <Button x:Name="TargetClear" Content="Очистить" Classes="btn" Click="TargetClear_Click" Margin="0,369,20,10" HorizontalAlignment="Right" VerticalAlignment = "Bottom" />
         <!--________________________________________-->
         <Menu Height="25" VerticalAlignment="Top">
             <MenuItem Header="Темы" Height="24" Width="50" HorizontalAlignment="Center" FontStyle="Normal" FontFamily="Algerian" FontWeight="Normal">
-                <Button x:Name="Dark" Content="Dark" FontFamily="Segoe UI Black" Click="MenuItem_Click"/>
-                <Button x:Name="Blue" Content="Blue" FontFamily="Segoe UI Black" Click="MenuItem_Click_1" />
-                <Button x:Name="White" Content="White" FontFamily="Segoe UI Black" Click="MenuItem_Click_2" />
-                <Button x:Name="Default" Content="Default" FontFamily="Segoe UI Black" Click="Default_Click" />
+                <Label x:Name="Dark" Content="Dark" FontFamily="Segoe UI Black" PointerPressed="Dark_Click"/>
+                <Label x:Name="Blue" Content="Blue" FontFamily="Segoe UI Black" PointerPressed="Blue_Click" />
+                <Label x:Name="White" Content="White" FontFamily="Segoe UI Black" PointerPressed="White_Click" />
+                <Label x:Name="Default" Content="Default" FontFamily="Segoe UI Black" PointerPressed="Default_Click" />
             </MenuItem>
         </Menu>
     </Grid>

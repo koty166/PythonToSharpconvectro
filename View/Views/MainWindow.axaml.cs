@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia;
+using Avalonia.Input;
 
 using TranslateLibrary;
 using System;
@@ -13,39 +14,39 @@ namespace Kyrs.Views
     {
         public MainWindow()
         {
-            InitializeComponent();
-        
+            InitializeComponent();        
         }
-         private void Button_Click(object sender, RoutedEventArgs e)
+         private void SourceClear_Click(object sender, RoutedEventArgs e)
         {
-            this.FindControl<TextBox>("TBSource").Clear();
+            TBSource.Clear();
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        private void TargetClear_Click(object sender, RoutedEventArgs e)
         {
-            this.FindControl<TextBox>("TBTarget").Clear();
+            TBTarget.Clear();
         }
 
-        private void Button_Click_2(object sender, RoutedEventArgs e)
-        {
+        private void Translate_Click(object sender, RoutedEventArgs e)
+        {   
+            TBTarget.Text = Core.Translate(TBSource.Text);
         }
 
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void MenuItem_Click_1(object sender, RoutedEventArgs e)
+        private void Blue_Click(object sender, PointerPressedEventArgs e)
         {
 
         }
 
-        private void MenuItem_Click_2(object sender, RoutedEventArgs e)
+        private void White_Click(object sender, PointerPressedEventArgs e)
         {
 
         }
 
-        private void Default_Click(object sender, RoutedEventArgs e)
+        private void Dark_Click(object sender, PointerPressedEventArgs e)
+        {
+
+        }
+
+        private void Default_Click(object sender, PointerPressedEventArgs e)
         {
             Color Cl1 = Color.FromArgb(0xFF ,0x9D, 0xC7, 0x97);
             Color Cl2 = Color.FromArgb(0xFF,0xE0,0x98,0x98);

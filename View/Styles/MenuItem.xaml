@@ -11,6 +11,5 @@
         </Style>
     <Style Selector="MenuItem.MyMenuStyle:pointerover /template/ ContentPresenter">
             <Setter Property="Background" Value="#FF4569BD"/>
-            <Setter Property="Foreground" Value="#FFFFFFFF"/>
         </Style>
 </Styles>
