@@ -9,9 +9,13 @@ class Program
     public static void Main()
     {
         string data = File.ReadAllText("Test.py");
-        char[] Separators = "=+-.".ToCharArray();
         Stopwatch s = Stopwatch.StartNew();
-        Core.GetTokenizatedText(data);
+        string res = Core.Translate(data);
         Console.WriteLine(s.ElapsedMilliseconds);
+
+        using(StreamWriter w = new StreamWriter("outTEst.txt",false))
+        {
+            w.Write(res);
+        }
     }
 }
