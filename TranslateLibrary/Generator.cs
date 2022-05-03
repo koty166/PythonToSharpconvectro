@@ -11,7 +11,6 @@ public class CodeGenerator
         foreach (var item in NodeTree)
         {
             Resb+=item.ToString()+ "\n";
-            //Корректно получать доступ к корневому элементу. Можно даже не хранить все, а только корневой.
         }
         return Resb.ToString();
     }

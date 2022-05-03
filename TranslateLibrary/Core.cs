@@ -10,19 +10,15 @@ namespace TranslateLibrary;
 
 public class Core
 {
-    public async Task<string> StartTranslate(string SourceCode)
-    {
-        string ResaultCode = string.Empty;
-        return ResaultCode;
-    }
     /// <summary>
     /// Основной метод трансляции кода. В обоих случаях сохраняется форматирование.
     /// </summary>
     /// <param name="SourceCode">Исходный код на Python</param>
     /// <returns>Код на c#</returns>
-    public string Translate(string SourceCode)
+    public static string Translate(string SourceCode)
     {
-        return string.Empty;
+        GenNodes(SourceCode);
+        return CodeGenerator.GenCode(ND.ToArray());
         
     }
     //Можеит заменить на список регулярок?
@@ -138,7 +134,6 @@ public class Core
 
         Node CurNode = new Node(GetUID(),ParentUID);
         Nodes.Add(CurNode.UID,CurNode);
-        ND.Add(CurNode);
         if(Line == String.Empty)
         {
             CurNode.NodeType = NodeTypes.NONE;
@@ -158,8 +153,9 @@ public class Core
             {
                 CurNode.NodeType = NodeTypes.EQUALS;
                 CurNode.Target = RSeparator;
+                ND.Add(CurNode);
             }
-            else if(RSeparator != ".")
+            else
             {
                 CurNode.NodeType = NodeTypes.OPERATOR;
                 CurNode.Target = RSeparator;
@@ -255,7 +251,7 @@ public class Core
 
         return CurNode;
     }
-    public static void GetTokenizatedText(string SourceCode)
+    static void GenNodes(string SourceCode)
     {
         string[] Lines = SourceCode.Split("\n",StringSplitOptions.RemoveEmptyEntries);
         Lines = Normalazing(Lines);
