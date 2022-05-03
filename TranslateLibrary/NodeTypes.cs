@@ -19,6 +19,7 @@ public enum NodeTypes:byte
     FOR,
     WHILE,
     BREAK,
-    RETURN
+    RETURN,
+    OPERATOR
 
 }

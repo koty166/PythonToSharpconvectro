@@ -26,7 +26,11 @@ public class Core
         
     }
     //Можеит заменить на список регулярок?
+    static List<Node> ND = new List<Node>();
+
+    static Dictionary<Int64,Node> Nodes = new Dictionary<long, Node>();
     static string[] ImportantPreferenses = new string[] {"=","+=","-=","*=","/=","==","+","-","*","/","in","."};
+    static string[] EqualsPosibilities = new string[] {"=","+=","-=","*=","/="};
     static int GetMostImportantMatchNumber(MatchCollection mc)
     {
         foreach (var item in ImportantPreferenses)
@@ -66,38 +70,31 @@ public class Core
 
         return new Random().NextInt64();
     }
-    public static List<NodeTree> ND = new List<NodeTree>();
+   
 
-    static NodeTypes GetNodeType(ref string Target)
+    static NodeTypes GetNodeType(ref string Target, Node CurNode)
     {
         string t = Target;
         NodeTypes NodeType = NodeTypes.NONE;
         IEnumerable<MyVar> VarRes = from cur in Vars
                                     where cur.name == t
                                     select cur;
-
-        if(VarRes.Count<MyVar>() != 0)
-        {
-            NodeType = NodeTypes.VAR;
-        }
-        else if(Regex.Matches(Target,@"\(.*[\d\w]*.*\)").Count != 0)
-        {
-            NodeType = NodeTypes.CALL;
-        }
-        else if(Regex.Matches(Target,"[\"'].*[\\d\\w]*.*[\"']").Count != 0 || Regex.Matches(Target,@"\d+").Count != 0)
+        int VarSearchRes = VarRes.Count();
+        NodeTypes ParentNodeType = Nodes[CurNode.UID].NodeType;
+        if(Regex.Matches(Target,"[\"'].*[\\d\\w]*.*[\"']").Count != 0 || Regex.Matches(Target,@"\d+").Count != 0)
         {
             NodeType = NodeTypes.CONST;
         }
-        else if(Target.Contains("import"))
-        {
-            NodeType = NodeTypes.IMPORT;
-            Target = Target.Split(' ')[1];
-        }
-        else
+        else if(VarSearchRes == 0 && (ParentNodeType == NodeTypes.EQUALS ||ParentNodeType == NodeTypes.FOR
+                                        || ParentNodeType == NodeTypes.WHILE ))
         {
             NodeType = NodeTypes.NVAR;
             Vars.Add(new MyVar(){name = Target}); 
-        }   
+        }
+        else
+        {
+            NodeType = NodeTypes.VAR;
+        } 
         return NodeType;
     }
     static List<string> BrecketsColl = new List<string>();
@@ -140,7 +137,8 @@ public class Core
     {   
 
         Node CurNode = new Node(GetUID(),ParentUID);
-
+        Nodes.Add(CurNode.UID,CurNode);
+        ND.Add(CurNode);
         if(Line == String.Empty)
         {
             CurNode.NodeType = NodeTypes.NONE;
@@ -156,14 +154,18 @@ public class Core
 
         if(RSeparator != null)
         {
-            CurNode.NodeType = NodeTypes.CALL;
-            CurNode.Target = RSeparator;
+            if(EqualsPosibilities.Contains(RSeparator))
+            {
+                CurNode.NodeType = NodeTypes.EQUALS;
+                CurNode.Target = RSeparator;
+            }
+            else if(RSeparator != ".")
+            {
+                CurNode.NodeType = NodeTypes.OPERATOR;
+                CurNode.Target = RSeparator;
+            }
         }
-        if(RSeparator ==  "=")
-        {
-            CurNode.NodeType = NodeTypes.EQUALS;
-            CurNode.Target = String.Empty;
-        }
+        
         
         Node? FirstChild = null, SecoundChild = null;
         if(Sublines.Length != 1)
@@ -184,35 +186,41 @@ public class Core
                 CurNode.Target = Sublines[0].Substring(0,FuncCallRegexResault.Index);
                 CurNode.ChildNodes = new Node[Params.Length];
 
-                ND[CurGlobalNDPos].Nodes.Add(CurNode);
-
                 for (int i = 0; i < Params.Length; i++)
                     CurNode.ChildNodes[i] = SeparateLinear(Params[i].Trim(),CurGlobalNDPos,CurNode.UID);
                 return CurNode;
             }
             CurNode.ChildNodes = null;
             CurNode.Target = Sublines[0];
-            CurNode.NodeType = GetNodeType(ref CurNode.Target);
+            CurNode.NodeType = GetNodeType(ref CurNode.Target,CurNode);
         }
-        ND[CurGlobalNDPos].Nodes.Add(CurNode);
         return CurNode;
     }
     static string[] Normalazing(string[] SourceCodeLines)
     {
         List<string> Lines = SourceCodeLines.ToList<string>();
         int CurTabsNum = 0;
+        int Opened = 0, Closed = 0;
         for (int i = 0; i < Lines.Count; i++)
         {
             int TabsNum = Lines[i].Count((ch) => ch == '\t');
             if(TabsNum > CurTabsNum)
+            {
                 Lines.Insert(i,NodeTypes.START.ToString());
+                Opened++;
+            }
             else if(TabsNum < CurTabsNum)
+            {
                 Lines.Insert(i,NodeTypes.END.ToString());
+                Closed++;
+            }
             CurTabsNum = TabsNum;
             if(Lines[i].Contains('#'))
                 Lines.RemoveAt(i);
             Lines[i] = Lines[i].Trim();
         }
+
+        Lines.Add(NodeTypes.END.ToString());
         return Lines.ToArray();
     }
     
@@ -220,7 +228,8 @@ public class Core
     {
         string NormalizedIfConstruction = Regex.Match(Line,@"(?<=if)[( ]?[\w\W]+[) ]?(?=:)").Value.Trim("() ".ToCharArray());
         Node CurNode =  new Node(GetUID(),ParentUID,NodeTypes.IF);
-        ND[CurGlobalNDPos].Nodes.Add(CurNode);
+        Nodes.Add(CurNode.UID,CurNode);
+        ND.Add(CurNode);
         CurNode.ChildNodes = new Node[1];
         CurNode.ChildNodes[0] = SeparateLinear(NormalizedIfConstruction,CurGlobalNDPos,CurNode.UID);
         return CurNode;
@@ -228,7 +237,7 @@ public class Core
     static Node ForConstructionSeparator(string Line,bool IsFor,int CurGlobalNDPos, Int64 ParentUID)
     {
         Node CurNode =  new Node(GetUID(),ParentUID);
-        
+        Nodes.Add(CurNode.UID,CurNode);
         string NormalizedIfConstruction = String.Empty;
         if(IsFor)
         {
@@ -242,7 +251,7 @@ public class Core
         }
         CurNode.ChildNodes = new Node[1];
         CurNode.ChildNodes[0] = SeparateLinear(NormalizedIfConstruction,CurGlobalNDPos,CurNode.UID);
-        ND[CurGlobalNDPos].Nodes.Add(CurNode);
+        ND.Add(CurNode);
 
         return CurNode;
     }
@@ -254,7 +263,6 @@ public class Core
         for (int i = 0; i < Lines.Length; i++)
         {
             Lines[i] = Lines[i].Trim();
-            ND.Add(new NodeTree());
             RepaceBreckets(ref Lines[i]);
             if(Lines[i].StartsWith("if"))
             {
@@ -271,19 +279,24 @@ public class Core
                 ForConstructionSeparator(Lines[i],false,i,i);
                 continue;
             }
+            else if(Lines[i].StartsWith("import"))
+            {
+                ND.Add(new Node(NodeTypes.IMPORT){Target = Lines[i].Split(' ')[1]});
+                continue;
+            }
             switch(Lines[i])
             {
                 case "START":
-                    ND[i].Nodes.Add(new Node(NodeTypes.START));
+                    ND.Add(new Node(NodeTypes.START));
                     break;
                 case "END":
-                    ND[i].Nodes.Add(new Node(NodeTypes.END));
+                    ND.Add(new Node(NodeTypes.END));
                     break;
                 case "continue":
-                    ND[i].Nodes.Add(new Node(NodeTypes.CONTINUE));
+                    ND.Add(new Node(NodeTypes.CONTINUE));
                     break;
                 case "break":
-                    ND[i].Nodes.Add(new Node(NodeTypes.BREAK));
+                    ND.Add(new Node(NodeTypes.BREAK));
                     break;
                 default:
                     SeparateLinear(Lines[i],i,i);
