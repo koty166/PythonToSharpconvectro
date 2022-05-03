@@ -5,12 +5,11 @@ public class CodeGenerator
 {
     public static string GenCode(Node[] NodeTree)
     {
-        //StringBuilder Resb = new StringBuilder(10000);
-        String Resb=String.Empty;
+        StringBuilder Resb = new StringBuilder(10000);
 
         foreach (var item in NodeTree)
         {
-            Resb+=item.ToString()+ "\n";
+            Resb.Append(item.ToString()+ "\n");
         }
         return Resb.ToString();
     }

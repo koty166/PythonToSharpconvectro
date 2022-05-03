@@ -11,7 +11,7 @@ public class Node
     public Int64 UID; 
     public Int64 ParentUID;
     public Node[]? ChildNodes;
-
+    public bool IsBrackets;
     public Node()
     {
         ChildNodes = null;
@@ -74,8 +74,10 @@ public class Node
             case NodeTypes.OPERATOR:
                 if(ChildNodes == null)
                     return "ERROR";
-
-                return ChildNodes[0].ToString() + Target+ChildNodes[1].ToString();
+                if(IsBrackets)
+                    return "("+ChildNodes[0].ToString() + Target+ChildNodes[1].ToString()+")";
+                else
+                    return ChildNodes[0].ToString() + Target+ChildNodes[1].ToString();
 
             case NodeTypes.NONE:
                 return String.Empty;
@@ -92,7 +94,7 @@ public class Node
                 return "}";
 
             case NodeTypes.START:
-                return "}";
+                return "{";
 
 
 
@@ -111,7 +113,8 @@ public class Node
             case NodeTypes.IF:
                 if(ChildNodes == null)
                     return "ERROR";
-
+                if(ChildNodes[0].IsBrackets)
+                    return  "if" + ChildNodes[0].ToString();
                 return  "if(" + ChildNodes[0].ToString() + ")";
 
             case NodeTypes.IMPORT:

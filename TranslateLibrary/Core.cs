@@ -129,24 +129,24 @@ public class Core
     /// <param name="IsLeft"></param>
     /// <param name="ParentUID"></param>
     /// <returns></returns>
-    public static Node SeparateLinear(string Line,int CurGlobalNDPos, Int64 ParentUID)
+    public static Node SeparateLinear(string Line,int CurGlobalNDPos, Int64 ParentUID, bool IsBrackets)
     {   
 
-        Node CurNode = new Node(GetUID(),ParentUID);
-        Nodes.Add(CurNode.UID,CurNode);
+       
         if(Line == String.Empty)
-        {
-            CurNode.NodeType = NodeTypes.NONE;
-            return CurNode;
-        }
+            return new Node(NodeTypes.NONE);
+
         string[] Sublines = Split(Line,out string? RSeparator);
+
         if(Sublines.Length == 1 && Sublines[0].StartsWith('#'))
         {
             int BracketCollIndex = int.Parse(Sublines[0].TrimStart('#'));
             string NormalazedLine = BrecketsColl[BracketCollIndex].Trim("()".ToCharArray());
-            return SeparateLinear(NormalazedLine,CurGlobalNDPos,ParentUID);
+            return SeparateLinear(NormalazedLine,CurGlobalNDPos,ParentUID,true);
         }
 
+        Node CurNode = new Node(GetUID(),ParentUID) {IsBrackets = IsBrackets};
+        Nodes.Add(CurNode.UID,CurNode);
         if(RSeparator != null)
         {
             if(EqualsPosibilities.Contains(RSeparator))
@@ -166,8 +166,8 @@ public class Core
         Node? FirstChild = null, SecoundChild = null;
         if(Sublines.Length != 1)
         {
-            FirstChild = SeparateLinear(Sublines[0].Trim(),CurGlobalNDPos,CurNode.UID);
-            SecoundChild = SeparateLinear(Sublines[1].Trim(),CurGlobalNDPos, CurNode.UID);
+            FirstChild = SeparateLinear(Sublines[0].Trim(),CurGlobalNDPos,CurNode.UID,false);
+            SecoundChild = SeparateLinear(Sublines[1].Trim(),CurGlobalNDPos, CurNode.UID,false);
             CurNode.ChildNodes = new Node[]{FirstChild,SecoundChild};
         }
         else
@@ -183,7 +183,7 @@ public class Core
                 CurNode.ChildNodes = new Node[Params.Length];
 
                 for (int i = 0; i < Params.Length; i++)
-                    CurNode.ChildNodes[i] = SeparateLinear(Params[i].Trim(),CurGlobalNDPos,CurNode.UID);
+                    CurNode.ChildNodes[i] = SeparateLinear(Params[i].Trim(),CurGlobalNDPos,CurNode.UID,false);
                 return CurNode;
             }
             CurNode.ChildNodes = null;
@@ -226,8 +226,9 @@ public class Core
         Node CurNode =  new Node(GetUID(),ParentUID,NodeTypes.IF);
         Nodes.Add(CurNode.UID,CurNode);
         ND.Add(CurNode);
+        
         CurNode.ChildNodes = new Node[1];
-        CurNode.ChildNodes[0] = SeparateLinear(NormalizedIfConstruction,CurGlobalNDPos,CurNode.UID);
+        CurNode.ChildNodes[0] = SeparateLinear(NormalizedIfConstruction,CurGlobalNDPos,CurNode.UID,false);
         return CurNode;
     }
     static Node ForConstructionSeparator(string Line,bool IsFor,int CurGlobalNDPos, Int64 ParentUID)
@@ -246,7 +247,7 @@ public class Core
             CurNode.NodeType = NodeTypes.WHILE;
         }
         CurNode.ChildNodes = new Node[1];
-        CurNode.ChildNodes[0] = SeparateLinear(NormalizedIfConstruction,CurGlobalNDPos,CurNode.UID);
+        CurNode.ChildNodes[0] = SeparateLinear(NormalizedIfConstruction,CurGlobalNDPos,CurNode.UID,false);
         ND.Add(CurNode);
 
         return CurNode;
@@ -295,7 +296,7 @@ public class Core
                     ND.Add(new Node(NodeTypes.BREAK));
                     break;
                 default:
-                    SeparateLinear(Lines[i],i,i);
+                    SeparateLinear(Lines[i],i,i,false);
                     break;
             }
             BrecketsColl.Clear();                
