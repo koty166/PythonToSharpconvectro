@@ -20,6 +20,8 @@ public enum NodeTypes:byte
     WHILE,
     BREAK,
     RETURN,
-    OPERATOR
+    OPERATOR,
+    IN,
+    ARRAY
 
 }
