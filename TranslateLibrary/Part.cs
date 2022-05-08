@@ -6,7 +6,7 @@ namespace TranslateLibrary;
 class Part
 {
     /// <summary>
-    /// Тип подстроки
+    /// Тип подстроки.
     /// </summary>
     public PartType Type;
     /// <summary>

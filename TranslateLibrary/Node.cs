@@ -74,10 +74,12 @@ public class Node
         switch(this.NodeType)
         {
             case NodeTypes.EQUALS:
+            case NodeTypes.IN:
+            case NodeTypes.OPERATOR:
                 if(ChildNodes == null)
                     return "ERROR";
 
-                return ChildNodes[0].ToString() + Target + ChildNodes[1].ToString() + ";";
+                return ChildNodes[0].ToString() + Target + ChildNodes[1].ToString() + (IsBase?";":"");
 
             case NodeTypes.CALL:
                 if(Target == null || ChildNodes==null)
@@ -110,15 +112,6 @@ public class Node
             case NodeTypes.VAR:
             case NodeTypes.CONST:
                 return Target;
-
-            case NodeTypes.IN:
-            case NodeTypes.OPERATOR:
-                if(ChildNodes == null)
-                    return "ERROR";
-                //if(IsBrackets)
-                   // return "("+ChildNodes[0].ToString() + Target+ChildNodes[1].ToString()+")"+ (IsBase?";":"");
-                else
-                    return ChildNodes[0].ToString() + Target+ChildNodes[1].ToString()+ (IsBase?";":"");
 
             case NodeTypes.NONE:
                 return String.Empty;

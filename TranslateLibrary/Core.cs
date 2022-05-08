@@ -63,14 +63,14 @@ public class Core
     static List<MyVar> Vars = new List<MyVar>();
     static  List<MyFunc> Funcs = new List<MyFunc>();
    
-    static bool IsNewVar(string Target, NodeTypes ParentNodeType)
+    static bool IsNewVar(string Target, Node ParentNode)
     {
         IEnumerable<MyVar> VarRes = from cur in Vars
                                     where cur.name == Target
                                     select cur;
         int VarSearchRes = VarRes.Count();
-        if(VarSearchRes == 0 && (ParentNodeType == NodeTypes.EQUALS ||ParentNodeType == NodeTypes.FOR
-                                        || ParentNodeType == NodeTypes.WHILE ))
+        if(VarSearchRes == 0 && ParentNode.IsBase/*(ParentNodeType == NodeTypes.EQUALS ||ParentNodeType == NodeTypes.FOR
+                                        || ParentNodeType == NodeTypes.WHILE )*/)
             return true;
         else
             return false;
@@ -79,7 +79,7 @@ public class Core
     {
         NodeTypes NodeType = NodeTypes.NONE;
         
-        NodeTypes ParentNodeType = Nodes[ParNodeUID].NodeType;
+        Node ParentNode = Nodes[ParNodeUID];
         MatchCollection ArrMatches = Regex.Matches(Target,",?([\\d]+|[\"'][\\d\\s\\w]+[\"']|[\\d\\w]+),?");
         if(Target.StartsWith('[') && Target.EndsWith(']'))
         {
@@ -101,7 +101,7 @@ public class Core
         {
             NodeType = NodeTypes.CONST;
         }
-        else if(IsNewVar(Target,ParentNodeType))
+        else if(IsNewVar(Target,ParentNode))
         {
             NodeType = NodeTypes.NVAR;
             Vars.Add(new MyVar(){name = Target}); 
@@ -156,7 +156,7 @@ public class Core
         if(Sublines.Length == 1 && Sublines[0].StartsWith('#'))
         {
             int BracketCollIndex = int.Parse(Sublines[0].TrimStart('#'));
-            string NormalazedLine = BrecketsColl[BracketCollIndex];
+            string NormalazedLine = BrecketsColl[BracketCollIndex].Trim("()".ToCharArray());
             if(NormalazedLine.StartsWith('[') && NormalazedLine.EndsWith(']'))
                 return SeparateLinear(NormalazedLine,CurGlobalNDPos,ParentUID,false,false);
             else
@@ -169,19 +169,8 @@ public class Core
             ND.Add(CurNode);
         if(RSeparator != null)
         {
-            if(EqualsPosibilities.Contains(RSeparator))
-            {
-                CurNode.NodeType = NodeTypes.EQUALS;
-                CurNode.Target = RSeparator;
-            }
-            else
-            {   
-                if(RSeparator == " in ")
-                    CurNode.NodeType = NodeTypes.IN;
-                else
-                    CurNode.NodeType = NodeTypes.OPERATOR;
-                CurNode.Target = RSeparator;
-            }
+            CurNode.NodeType = NodeTypes.OPERATOR;
+            CurNode.Target = RSeparator;
         }
 
         
