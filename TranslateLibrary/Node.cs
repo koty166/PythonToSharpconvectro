@@ -78,9 +78,10 @@ public class Node
             case NodeTypes.OPERATOR:
                 if(ChildNodes == null)
                     return "ERROR";
-                    
-                return ChildNodes[0].ToString() + Target + ChildNodes[1].ToString() + (IsBase?";":"");
-
+                if(!IsBrackets)
+                    return ChildNodes[0].ToString() + Target + ChildNodes[1].ToString() + (IsBase?";":"");
+                else
+                    return "("+ChildNodes[0].ToString() + Target + ChildNodes[1].ToString()+")" + (IsBase?";":"");
             case NodeTypes.CALL:
                 if(Target == null || ChildNodes==null)
                     return "ERROR";
@@ -106,12 +107,15 @@ public class Node
             case NodeTypes.NVAR:
                 if(Target == null)
                     return "ERROR";
-
+                    
                 return "dynamic "+Target;
 
             case NodeTypes.VAR:
             case NodeTypes.CONST:
-                return Target;
+                if(!IsBrackets)
+                    return Target;
+                else
+                    return "("+Target +")";
 
             case NodeTypes.NONE:
                 return String.Empty;
@@ -155,7 +159,7 @@ public class Node
                 if(Target == null)
                     return "ERROR";
                 
-                return "using "+Target;
+                return "using "+Target+";";
 
             default:
             return "ERROR";

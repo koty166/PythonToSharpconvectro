@@ -161,34 +161,6 @@ public class Core
                                         MValue.Trim("()".ToCharArray())));
 
                                     return "#"+CurrPointer++; });
-
-
-        /*bool IsSeparatorStart (char ch) => ch == '(' ||ch == '['|| ch == '\''|| ch == '\"';
-        string LocalCopyOfTheLine = Line;
-        int CurrBrecketsCollIndex = BrecketsColl.Count - 1;
-
-        List<int> OpenedBrecketsIndexes = new List<int>();
-        for (int i = 0; i < Line.Length; i++)
-        {
-            char c = Line[i];
-            if(Line[i] == '(' || Line[i] == '[' || Line[i] == '"')
-                OpenedBrecketsIndexes.Add(i);
-            else if(Line[i]== ')' || Line[i] == ']')
-            {
-                if(OpenedBrecketsIndexes.Count == 0)
-                {
-                    Console.WriteLine("ERROR");
-                    continue;
-                }
-
-                CurrBrecketsCollIndex++;
-                string BufSubLine = Line.Substring(OpenedBrecketsIndexes.Last(),i - OpenedBrecketsIndexes.Last() +1);
-                Line = Line.Replace(BufSubLine,$"#{CurrBrecketsCollIndex}");
-                BrecketsColl.Add(BufSubLine);
-                OpenedBrecketsIndexes.RemoveAt(OpenedBrecketsIndexes.Count-1);
-                i-= BufSubLine.Length;
-            }
-        }*/
     }
     
     /// <summary>
@@ -364,7 +336,25 @@ public class Core
             }
             else if(Lines[i].StartsWith("import"))
             {
-                ND.Add(new Node(NodeTypes.IMPORT){Target = Lines[i].Split(' ')[1]});
+                if(Lines[i].Contains(" as "))
+                    ND.Add(new Node(NodeTypes.IMPORT)
+                    {
+                        Target =  Regex.Split(Lines[i]," as ")[1] + " = "+ Lines[i].Split(' ')[1]
+                    });
+                else
+                    ND.Add(new Node(NodeTypes.IMPORT){Target = Lines[i].Split(' ')[1]});
+                
+                continue;
+            }
+            else if(Lines[i].StartsWith("from"))
+            {
+                if(Lines[i].Contains(" as "))
+                    ND.Add(new Node(NodeTypes.IMPORT)
+                    {
+                        Target = "static " + Regex.Split(Lines[i]," as ")[1] + " = "+ Lines[i].Split(' ')[1]
+                    });
+                else
+                    ND.Add(new Node(NodeTypes.IMPORT){Target = "static " + Lines[i].Split(' ')[1]});
                 continue;
             }
             switch(Lines[i])
