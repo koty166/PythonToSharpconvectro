@@ -21,6 +21,8 @@ public class Core
         Nodes.Clear();
         Vars.Clear();
         Funcs.Clear();
+        PartsColl.Clear();
+
         GenNodes(SourceCode);
         return CodeGenerator.GenCode(ND.ToArray());
         
@@ -29,8 +31,14 @@ public class Core
     static List<Node> ND = new List<Node>();
 
     static Dictionary<Int64,Node> Nodes = new Dictionary<long, Node>();
-    static string[] ImportantPreferenses = new string[] {"=","+=","-=","*=","/=","==","+","-","*","/","in","."};
+    static string[] ImportantPreferenses = new string[] {"=","+=","-=","*=","/=","==",">=","<=","<",">"," and "," or ","+","-","*","/","in","."};
     static string[] EqualsPosibilities = new string[] {"=","+=","-=","*=","/="};
+
+    static List<MyVar> Vars = new List<MyVar>();
+    static  List<MyFunc> Funcs = new List<MyFunc>();
+
+    static List<Part> PartsColl = new List<Part>();
+
     static int GetMostImportantMatchNumber(MatchCollection mc)
     {
         foreach (var item in ImportantPreferenses)
@@ -60,8 +68,7 @@ public class Core
 
         return new string[] {LeftRes,RightRes};
     }
-    static List<MyVar> Vars = new List<MyVar>();
-    static  List<MyFunc> Funcs = new List<MyFunc>();
+    
    
     static bool IsNewVar(string Target, Node ParentNode)
     {
@@ -110,9 +117,53 @@ public class Core
             NodeType = NodeTypes.VAR;
         return NodeType;
     }
-    static List<string> BrecketsColl = new List<string>();
+    
     public static void RepaceBreckets(ref string Line)
     {
+        //Перенести в какйо-нибудь отдельный класс для пре-инициализации.
+        Regex ReplaceEmpty = new Regex("(\"\")|(\'\')|(\\[\\])|(\\(\\))",RegexOptions.Compiled);
+        Regex ReplaceNonEmptyQuotation = new Regex("(\"[^\"]+\")|('[^']+')",RegexOptions.Compiled);
+        Regex ReplaceNonEmptyArrBrackets = new Regex(@"(\[[^\[\]]+\])",RegexOptions.Compiled);
+        Regex ReplaceNonEmptyBrackets = new Regex(@"\(([^()]+\))",RegexOptions.Compiled);
+        
+        int CurrPointer = PartsColl.Count;
+        
+        Line =  ReplaceEmpty.Replace(Line,(Match m) => { 
+                                    string MValue = m.Value;
+
+                                    PartsColl.Add(new Part(
+                                        PartType.Constant,
+                                        MValue));
+                                    return "#"+CurrPointer++; });
+
+        Line = ReplaceNonEmptyQuotation.Replace(Line,(Match m) => { 
+                                    string MValue = m.Value;
+
+                                    PartsColl.Add(new Part(
+                                        PartType.Constant,
+                                        MValue));
+                                    return "#"+CurrPointer++; });
+
+        Line = ReplaceNonEmptyArrBrackets.Replace(Line,(Match m) => { 
+                                   string MValue = m.Value;
+
+                                    PartsColl.Add(new Part(
+                                        PartType.Array,
+                                        MValue.Trim("[]".ToCharArray())));
+                                         
+                                    return "#"+CurrPointer++; });
+
+        Line = ReplaceNonEmptyBrackets.Replace(Line,(Match m) => { 
+                                    string MValue = m.Value;
+
+                                    PartsColl.Add(new Part(
+                                        PartType.Brackets,
+                                        MValue.Trim("()".ToCharArray())));
+
+                                    return "#"+CurrPointer++; });
+
+
+        /*bool IsSeparatorStart (char ch) => ch == '(' ||ch == '['|| ch == '\''|| ch == '\"';
         string LocalCopyOfTheLine = Line;
         int CurrBrecketsCollIndex = BrecketsColl.Count - 1;
 
@@ -120,7 +171,7 @@ public class Core
         for (int i = 0; i < Line.Length; i++)
         {
             char c = Line[i];
-            if(Line[i] == '(' || Line[i] == '[')
+            if(Line[i] == '(' || Line[i] == '[' || Line[i] == '"')
                 OpenedBrecketsIndexes.Add(i);
             else if(Line[i]== ')' || Line[i] == ']')
             {
@@ -137,8 +188,9 @@ public class Core
                 OpenedBrecketsIndexes.RemoveAt(OpenedBrecketsIndexes.Count-1);
                 i-= BufSubLine.Length;
             }
-        }
+        }*/
     }
+    
     /// <summary>
     /// Построение древа для линейного выражения.
     /// </summary>
@@ -148,23 +200,43 @@ public class Core
     /// <returns></returns>
     public static Node SeparateLinear(string Line,int CurGlobalNDPos, Int64 ParentUID, bool IsBrackets, bool IsBase)
     {   
-        if(Line == String.Empty)
+        if(Line == String.Empty || Line == "()")
             return new Node(NodeTypes.NONE);
 
         string[] Sublines = Split(Line,out string? RSeparator);
-
+        Node CurNode = new Node(ParentUID) {IsBrackets = IsBrackets, IsBase = IsBase};
+        Nodes.Add(CurNode.UID,CurNode);
+        
         if(Sublines.Length == 1 && Sublines[0].StartsWith('#'))
         {
             int BracketCollIndex = int.Parse(Sublines[0].TrimStart('#'));
-            string NormalazedLine = BrecketsColl[BracketCollIndex].Trim("()".ToCharArray());
-            if(NormalazedLine.StartsWith('[') && NormalazedLine.EndsWith(']'))
-                return SeparateLinear(NormalazedLine,CurGlobalNDPos,ParentUID,false,false);
+            var t = PartsColl;
+            Part CurrPart = PartsColl[BracketCollIndex];
+            
+            if(CurrPart.Type == PartType.Constant)
+            {
+                CurNode.NodeType = NodeTypes.CONST;
+                CurNode.ChildNodes = null;
+                CurNode.Target = CurrPart.Target;
+                return CurNode;
+            }
+            else if(CurrPart.Type == PartType.Array)
+            {
+                string[] ArrItems = PartsColl[BracketCollIndex].Target.Split(',',StringSplitOptions.TrimEntries);
+                CurNode.NodeType = NodeTypes.ARRAY;
+                CurNode.ChildNodes = new Node[ArrItems.Length];
+
+                for (int i = 0; i < ArrItems.Length; i++)
+                    CurNode.ChildNodes[i] = SeparateLinear(ArrItems[i].Trim(),CurGlobalNDPos,CurNode.UID,false,false);
+                
+                return CurNode;
+            }
             else
-                return SeparateLinear(NormalazedLine,CurGlobalNDPos,ParentUID,true,false);
+            return SeparateLinear(CurrPart.Target,CurGlobalNDPos,ParentUID,true,false);
         }
 
-        Node CurNode = new Node(ParentUID) {IsBrackets = IsBrackets, IsBase = IsBase};
-        Nodes.Add(CurNode.UID,CurNode);
+       
+        
         if(IsBase)
             ND.Add(CurNode);
         if(RSeparator != null)
@@ -173,9 +245,6 @@ public class Core
             CurNode.Target = RSeparator;
         }
 
-        
-        
-        
         Node? FirstChild = null, SecoundChild = null;
         if(Sublines.Length != 1)
         {
@@ -189,7 +258,7 @@ public class Core
             if(FuncCallRegexResault.Value != String.Empty)
             {
                 int BracketCollIndex = int.Parse(FuncCallRegexResault.Value.TrimStart('#'));
-                string[] Params = BrecketsColl[BracketCollIndex].Trim("()".ToCharArray()).Split(',');
+                string[] Params = PartsColl[BracketCollIndex].Target.Split(',');
 
                 CurNode.NodeType = NodeTypes.CALL;
                 CurNode.Target = Sublines[0].Substring(0,FuncCallRegexResault.Index);
@@ -315,8 +384,7 @@ public class Core
                 default:
                     SeparateLinear(Lines[i],i,i,false,true);
                     break;
-            }
-            BrecketsColl.Clear();                
+            }            
         }
     }
 

@@ -3,6 +3,8 @@ namespace TranslateLibrary;
 public enum PartType : byte
 {
     Comment,
-    Breckets,
-    Array
+    Brackets,
+    Array,
+    Constant,
+    None
 }

@@ -78,7 +78,7 @@ public class Node
             case NodeTypes.OPERATOR:
                 if(ChildNodes == null)
                     return "ERROR";
-
+                    
                 return ChildNodes[0].ToString() + Target + ChildNodes[1].ToString() + (IsBase?";":"");
 
             case NodeTypes.CALL:

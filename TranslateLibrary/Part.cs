@@ -3,7 +3,7 @@ namespace TranslateLibrary;
 /// <summary>
 /// Представляет собой часть строки, может быть комментарием, скобкой...
 /// </summary>
-class Part
+public class Part
 {
     /// <summary>
     /// Тип подстроки.
@@ -12,23 +12,24 @@ class Part
     /// <summary>
     /// Значение подстроки.
     /// </summary>
-    public string? Target;
+    public string Target;
 
     public Part()
     {
-        Target = null;
+        Target = String.Empty;
     }
-    public Part(PartType _Type, string _Target)
+    public Part(PartType _Type, string _Target) : this()
     {
         Type = _Type;
         Target = _Target;
     }
-    public Part(PartType _Type)
+    public Part(PartType _Type) : this()
     {
         Type = _Type;
     }
-    public Part(string _Target)
+    public Part(string _Target) : this()
     {
         Target = _Target;
     }
+
 }
