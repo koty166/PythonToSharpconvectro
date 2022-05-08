@@ -47,8 +47,6 @@
             FontSize="16" FontFamily="Arial"
             Classes="MyTBStyleStandart" Margin="70,70,20,70" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Text=""  AcceptsReturn="True" AcceptsTab="True" />
     </Grid>
-        <TextBox x:Name="Colorsvalue1" Height="20" Width="100" Margin = "0,80,0,0"/>
-        <TextBox x:Name="Colorsvalue2" Height="20" Width="100"/>
         
 
         <Label x:Name="LS" Content="Исходный код на Python" Margin="20,30,512,369" HorizontalContentAlignment="Left"/>

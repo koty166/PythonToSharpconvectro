@@ -12,6 +12,7 @@ public class Node
      Int64 ParentUID;
     public Node[]? ChildNodes;
     public bool IsBrackets;
+    public bool IsBase;
     public Node()
     {
         ChildNodes = null;
@@ -87,7 +88,7 @@ public class Node
                     ParamRes.Append(item.ToString() + ", ");
                 ParamRes.Remove(ParamRes.Length-2,2);
 
-                return Target+"("+ParamRes.ToString() + ")";
+                return Target+"("+ParamRes.ToString() + ")" + (IsBase?";":"");
 
             case NodeTypes.ARRAY:
                 if(Target == null || ChildNodes==null)
@@ -114,10 +115,10 @@ public class Node
             case NodeTypes.OPERATOR:
                 if(ChildNodes == null)
                     return "ERROR";
-                if(IsBrackets)
-                    return "("+ChildNodes[0].ToString() + Target+ChildNodes[1].ToString()+")";
+                //if(IsBrackets)
+                   // return "("+ChildNodes[0].ToString() + Target+ChildNodes[1].ToString()+")"+ (IsBase?";":"");
                 else
-                    return ChildNodes[0].ToString() + Target+ChildNodes[1].ToString();
+                    return ChildNodes[0].ToString() + Target+ChildNodes[1].ToString()+ (IsBase?";":"");
 
             case NodeTypes.NONE:
                 return String.Empty;
