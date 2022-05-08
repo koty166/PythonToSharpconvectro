@@ -70,14 +70,13 @@ public class Core
     }
     
    
-    static bool IsNewVar(string Target, Node ParentNode)
+    static bool IsNewVar(string Target, Node ParentNode, NodeTypes ParentNodeType)
     {
         IEnumerable<MyVar> VarRes = from cur in Vars
                                     where cur.name == Target
                                     select cur;
         int VarSearchRes = VarRes.Count();
-        if(VarSearchRes == 0 && ParentNode.IsBase/*(ParentNodeType == NodeTypes.EQUALS ||ParentNodeType == NodeTypes.FOR
-                                        || ParentNodeType == NodeTypes.WHILE )*/)
+        if(VarSearchRes == 0 && ParentNode.IsBase && (ParentNodeType == NodeTypes.IN ||ParentNodeType == NodeTypes.EQUALS)) 
             return true;
         else
             return false;
@@ -108,7 +107,7 @@ public class Core
         {
             NodeType = NodeTypes.CONST;
         }
-        else if(IsNewVar(Target,ParentNode))
+        else if(IsNewVar(Target,ParentNode, ParentNode.NodeType))
         {
             NodeType = NodeTypes.NVAR;
             Vars.Add(new MyVar(){name = Target}); 
@@ -213,7 +212,11 @@ public class Core
             ND.Add(CurNode);
         if(RSeparator != null)
         {
-            CurNode.NodeType = NodeTypes.OPERATOR;
+            if(EqualsPosibilities.Contains(RSeparator))
+                CurNode.NodeType = NodeTypes.EQUALS;
+            else
+                CurNode.NodeType = NodeTypes.OPERATOR;
+                
             CurNode.Target = RSeparator;
         }
 
@@ -334,27 +337,9 @@ public class Core
                 ForConstructionSeparator(Lines[i],false,i,i);
                 continue;
             }
-            else if(Lines[i].StartsWith("import"))
+            else if(Lines[i].StartsWith("import") || Lines[i].StartsWith("from"))
             {
-                if(Lines[i].Contains(" as "))
-                    ND.Add(new Node(NodeTypes.IMPORT)
-                    {
-                        Target =  Regex.Split(Lines[i]," as ")[1] + " = "+ Lines[i].Split(' ')[1]
-                    });
-                else
-                    ND.Add(new Node(NodeTypes.IMPORT){Target = Lines[i].Split(' ')[1]});
-                
-                continue;
-            }
-            else if(Lines[i].StartsWith("from"))
-            {
-                if(Lines[i].Contains(" as "))
-                    ND.Add(new Node(NodeTypes.IMPORT)
-                    {
-                        Target = "static " + Regex.Split(Lines[i]," as ")[1] + " = "+ Lines[i].Split(' ')[1]
-                    });
-                else
-                    ND.Add(new Node(NodeTypes.IMPORT){Target = "static " + Lines[i].Split(' ')[1]});
+                ND.Add(new Node(NodeTypes.IMPORT){Target = Lines[i]});
                 continue;
             }
             switch(Lines[i])

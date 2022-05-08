@@ -1,5 +1,7 @@
 
 using System.Text;
+using System.Text.RegularExpressions;
+
 namespace TranslateLibrary;
 
 
@@ -86,6 +88,8 @@ public class Node
                 if(Target == null || ChildNodes==null)
                     return "ERROR";
 
+                Target = PostGenerationReplacement.PostTypeCasting(Target);
+                
                 StringBuilder ParamRes = new StringBuilder(100);
                 foreach (var item in ChildNodes)
                     ParamRes.Append(item.ToString() + ", ");
@@ -158,8 +162,20 @@ public class Node
             case NodeTypes.IMPORT:
                 if(Target == null)
                     return "ERROR";
-                
-                return "using "+Target+";";
+                string LibName = String.Empty;
+                if(Target.Contains(" as "))
+                    LibName = Regex.Split(Target," as ")[1] + " = ";
+                if(Target.StartsWith("import")) 
+                { 
+                    LibName = LibName + Target.Split(' ')[1];
+                } 
+                else if(Target.StartsWith("from"))
+                {
+                    LibName = String.Empty;
+                    LibName = "static " + LibName + Target.Split(' ')[1];
+                }
+
+                return "using "+LibName+";";
 
             default:
             return "ERROR";
