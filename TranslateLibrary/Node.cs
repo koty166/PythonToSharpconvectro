@@ -100,13 +100,8 @@ public class Node
             case NodeTypes.ARRAY:
                 if(Target == null || ChildNodes==null)
                     return "ERROR";
-
-                StringBuilder ArrValues = new StringBuilder(100);
-                foreach (var item in ChildNodes)
-                    ArrValues.Append(item.ToString() + ", ");
-                ArrValues.Remove(ArrValues.Length-2,2);
-
-                return Target+"["+ArrValues.ToString() + "]";
+                string ChildStr = ChildNodes[0].ToString().Replace(":","..").Replace("-","^");
+                return Target+"["+ChildStr + "]";
                 
             case NodeTypes.NVAR:
                 if(Target == null)

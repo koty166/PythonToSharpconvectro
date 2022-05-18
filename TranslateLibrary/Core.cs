@@ -78,7 +78,7 @@ public class Core
         int VarSearchRes = VarRes.Count();
         if(VarSearchRes == 0 && ParentNode.IsBase && (ParentNodeType == NodeTypes.IN ||ParentNodeType == NodeTypes.EQUALS)) 
             return true;
-        else
+        else 
             return false;
     }
     static NodeTypes GetNodeType(ref string Target, long ParNodeUID, Node CurrNode)
@@ -191,7 +191,7 @@ public class Core
                 CurNode.Target = CurrPart.Target;
                 return CurNode;
             }
-            else if(CurrPart.Type == PartType.Array)
+            /*else if(CurrPart.Type == PartType.Array)
             {
                 string[] ArrItems = PartsColl[BracketCollIndex].Target.Split(',',StringSplitOptions.TrimEntries);
                 CurNode.NodeType = NodeTypes.ARRAY;
@@ -201,7 +201,7 @@ public class Core
                     CurNode.ChildNodes[i] = SeparateLinear(ArrItems[i].Trim(),CurGlobalNDPos,CurNode.UID,false,false);
                 
                 return CurNode;
-            }
+            }*/ // недостижимый код 
             else
             return SeparateLinear(CurrPart.Target,CurGlobalNDPos,ParentUID,true,false);
         }
@@ -235,7 +235,10 @@ public class Core
                 int BracketCollIndex = int.Parse(FuncCallRegexResault.Value.TrimStart('#'));
                 string[] Params = PartsColl[BracketCollIndex].Target.Split(',');
 
-                CurNode.NodeType = NodeTypes.CALL;
+                if(PartsColl[BracketCollIndex].Type == PartType.Brackets)
+                    CurNode.NodeType = NodeTypes.CALL;
+                else if(PartsColl[BracketCollIndex].Type == PartType.Array)
+                    CurNode.NodeType = NodeTypes.ARRAY;
                 CurNode.Target = Sublines[0].Substring(0,FuncCallRegexResault.Index);
                 CurNode.ChildNodes = new Node[Params.Length];
 
