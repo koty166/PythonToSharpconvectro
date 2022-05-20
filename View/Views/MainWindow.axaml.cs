@@ -5,7 +5,7 @@ using Avalonia;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml.Styling;
 
-using TranslateLibrary;
+using TranslateLibrary.API;
 using System;
 using System.Diagnostics;
 
@@ -54,8 +54,8 @@ namespace Kyrs.Views
             */
             if(TBSource.Text.Trim() != String.Empty)
             {
-                string buf = Core.Translate(TBSource.Text);
-                TBTarget.Text = buf;
+                API.Translate(TBSource.Text, out string Resault, out string Error);
+                TBTarget.Text = Resault;
             }
         }
 

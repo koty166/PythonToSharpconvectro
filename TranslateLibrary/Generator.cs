@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace TranslateLibrary;
+namespace TranslateLibrary.CoreLib;
 public class CodeGenerator
 {
     public static string GenCode(Node[] NodeTree)
