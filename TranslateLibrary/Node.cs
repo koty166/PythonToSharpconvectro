@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace TranslateLibrary;
+namespace TranslateLibrary.CoreLib;
 
 
 
@@ -11,7 +11,7 @@ public class Node
     public NodeTypes NodeType;
     public String Target;
     public Int64 UID {get; private set;}
-     Int64 ParentUID;
+    Int64 ParentUID;
     public Node[]? ChildNodes;
     public bool IsBrackets;
     public bool IsBase;
@@ -71,7 +71,7 @@ public class Node
     static Int64 GetUID() => new Random().NextInt64();
 
 
-    public override string ToString()
+    public string MyToString(PostGenerationOptimizingT Opt)
     {
         switch(this.NodeType)
         {
@@ -81,26 +81,29 @@ public class Node
                 if(ChildNodes == null)
                     return "ERROR";
                 if(!IsBrackets)
-                    return ChildNodes[0].ToString() + Target + ChildNodes[1].ToString() + (IsBase?";":"");
+                    return ChildNodes[0].MyToString(Opt) + Target + ChildNodes[1].MyToString(Opt) + (IsBase?";":"");
                 else
-                    return "("+ChildNodes[0].ToString() + Target + ChildNodes[1].ToString()+")" + (IsBase?";":"");
+                    return "("+ChildNodes[0].MyToString(Opt) + Target + ChildNodes[1].MyToString(Opt) +")" + (IsBase?";":"");
             case NodeTypes.CALL:
                 if(Target == null || ChildNodes==null)
                     return "ERROR";
 
-                Target = PostGenerationReplacement.PostTypeCasting(Target);
+                Target = PostGenerationReplacement.PostGenerationOptimizing(Target,Opt, out bool IsRight);
                 
                 StringBuilder ParamRes = new StringBuilder(100);
                 foreach (var item in ChildNodes)
-                    ParamRes.Append(item.ToString() + ", ");
+                    ParamRes.Append(item.MyToString(Opt)  + ", ");
                 ParamRes.Remove(ParamRes.Length-2,2);
-
-                return Target+"("+ParamRes.ToString() + ")" + (IsBase?";":"");
+                
+                if(IsRight)
+                    return Target+"("+ParamRes.ToString()  + ")" + (IsBase?";":"");
+                else
+                     return "("+ParamRes.ToString()  + ")"+Target + (IsBase?";":"");
 
             case NodeTypes.ARRAY:
-                if(Target == null || ChildNodes==null)
+                if(Target is null || ChildNodes is null || ChildNodes[0] is null)
                     return "ERROR";
-                string ChildStr = ChildNodes[0].ToString().Replace(":","..").Replace("-","^");
+                string ChildStr = ChildNodes[0].MyToString(Opt) .Replace(":","..").Replace("-","^");
                 return Target+"["+ChildStr + "]";
                 
             case NodeTypes.NVAR:
@@ -139,20 +142,20 @@ public class Node
                 if(ChildNodes == null)
                     return "ERROR";
 
-                return  "foreach(" + ChildNodes[0].ToString() + ")";
+                return  "foreach(" + ChildNodes[0].MyToString(Opt)  + ")";
 
             case NodeTypes.WHILE:
                 if(ChildNodes == null)
                     return "ERROR";
 
-                return  "while(" + ChildNodes[0].ToString() + ")";
+                return  "while(" + ChildNodes[0].MyToString(Opt)  + ")";
 
             case NodeTypes.IF:
                 if(ChildNodes == null)
                     return "ERROR";
                 if(ChildNodes[0].IsBrackets)
-                    return  "if" + ChildNodes[0].ToString();
-                return  "if(" + ChildNodes[0].ToString() + ")";
+                    return  "if" + ChildNodes[0].MyToString(Opt) ;
+                return  "if(" + ChildNodes[0].MyToString(Opt)  + ")";
 
             case NodeTypes.IMPORT:
                 if(Target == null)

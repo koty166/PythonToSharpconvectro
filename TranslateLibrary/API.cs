@@ -7,7 +7,7 @@ namespace TranslateLibrary.API;
 
 public static class API
 {
-    public static bool Translate(string TextToTranslate, out string TranslatedText, out string Error)
+    public static bool Translate(string TextToTranslate, PostGenerationOptimizingT Opt, out string TranslatedText, out string Error)
     {
         if(TextToTranslate is null || TextToTranslate.Trim() == string.Empty)
         {
@@ -18,7 +18,7 @@ public static class API
         //try
         //{   
             
-            TranslatedText = new Core().Translate(TextToTranslate as string);
+            TranslatedText = new Core().Translate(TextToTranslate as string, Opt);
             Error = String.Empty;
             return true;
         //}

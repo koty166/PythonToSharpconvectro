@@ -16,13 +16,13 @@ public class Core
     /// </summary>
     /// <param name="SourceCode">Исходный код на Python</param>
     /// <returns>Код на c#</returns>
-    public string Translate(object? SourceCode)
+    public string Translate(object? SourceCode, PostGenerationOptimizingT Opt)
     {
         CurrentParsing = new Parse()
                                 {RootNodes = new List<Node>(),
                                  PartsColl = new List<Part>()};
         GenNodes(SourceCode as string);
-        string Resautl = CodeGenerator.GenCode(CurrentParsing.RootNodes.ToArray());
+        string Resautl = CodeGenerator.GenCode(CurrentParsing.RootNodes.ToArray(),Opt);
         return Resautl;
     }
     Parse CurrentParsing;
@@ -41,7 +41,7 @@ public class Core
                                     string MValue = m.Value;
 
                                     CurrentParsing.PartsColl.Add(new Part(
-                                        PartType.Constant,
+                                        (m.Value == "()" ? PartType.Brackets: PartType.Constant),
                                         MValue));
                                     return "#"+CurrPointer++; });
 

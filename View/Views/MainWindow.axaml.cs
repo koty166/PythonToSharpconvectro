@@ -54,7 +54,7 @@ namespace Kyrs.Views
             */
             if(TBSource.Text.Trim() != String.Empty)
             {
-                API.Translate(TBSource.Text, out string Resault, out string Error);
+                API.Translate(TBSource.Text,TranslateLibrary.CoreLib.PostGenerationOptimizingT.Simple, out string Resault, out string Error);
                 TBTarget.Text = Resault;
             }
         }
