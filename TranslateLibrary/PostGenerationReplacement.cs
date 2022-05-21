@@ -25,7 +25,7 @@ internal class PostGenerationReplacement
                 case "ord":
                     return "(int)";
                 case "dict":
-                    return "new List<object>";
+                    return "new List";
                 case "hash":
                     IsRight = false;
                     return ".GetHashCode()";
@@ -44,15 +44,15 @@ internal class PostGenerationReplacement
                     return ".Count()";
                 case "list":
                     IsRight = false;
-                    return ".ToList<object>()";
+                    return ".ToList()";
                 case "range":
                     return "new Range";
                 case "sorted":
                     IsRight = false;
-                    return ".ToList<object>().Sort()";
+                    return ".ToList().Sort()";
                 case "sum":
                     IsRight = false;
-                    return ".ToList<object>().Sum()";
+                    return ".ToList().Sum()";
                 case "type":
                     return "typeof";
                 case "abs":
@@ -61,5 +61,18 @@ internal class PostGenerationReplacement
             }   
         }
         return Type;
+    }
+    internal static string ReplaceLogicalOperators(string Target)
+    {
+        switch(Target)
+        {
+            case " AND ":
+            case " and ":
+                return " && ";
+            case " OR ":
+            case " or ":
+                return " || ";
+        }
+        return Target;
     }
 }

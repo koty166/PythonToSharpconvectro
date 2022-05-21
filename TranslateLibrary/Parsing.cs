@@ -11,7 +11,7 @@ public class Parse
     Dictionary<Int64,Node> Nodes = new Dictionary<long, Node>();
     List<MyVar> Vars = new List<MyVar>();
    
-    static string[] ImportantPreferenses = new string[] {"=","+=","-=","*=","/=","==",">=","<=","<",">"," and "," or ","+","-","*","/","in","."};
+    static string[] ImportantPreferenses = new string[] {"=","+=","-=","*=","/=","==",">=","<=","<",">"," and "," or ","+","-","*","/"," in ","."};
     static string[] EqualsPosibilities = new string[] {"=","+=","-=","*=","/="};
 
     bool IsNewVar(string Target, Node ParentNode, NodeTypes ParentNodeType)
@@ -64,7 +64,7 @@ public class Parse
 
     static string[] Split(String s,out string? RSeparator)
     {
-        Regex r = new Regex(@"[=*\/+-.]+| in ");
+        Regex r = new Regex(@"[=*\/+-.]+| in | and | or ");
 
         string[] SubStrings =  r.Split(s);
         if(SubStrings.Length <= 1)
@@ -144,6 +144,17 @@ public class Parse
                 CurNode.NodeType = NodeTypes.CONST;
                 CurNode.ChildNodes = null;
                 CurNode.Target = CurrPart.Target;
+                return CurNode;
+            }
+            else if(CurrPart.Type == PartType.Array)
+            {
+                string[] ArrItems = PartsColl[BracketCollIndex].Target.Split(',',StringSplitOptions.TrimEntries);
+                CurNode.NodeType = NodeTypes.ARRAY;
+                CurNode.ChildNodes = new Node[ArrItems.Length];
+
+                for (int i = 0; i < ArrItems.Length; i++)
+                    CurNode.ChildNodes[i] = SeparateLinear(ArrItems[i].Trim(),CurGlobalNDPos,CurNode.UID,false,false);
+                
                 return CurNode;
             }
             else

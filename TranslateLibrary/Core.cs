@@ -27,6 +27,21 @@ public class Core
     }
     Parse CurrentParsing;
     
+    PartType GetPartType(string s)
+    {
+        switch (s)
+        {
+            case "()":
+                return PartType.Brackets;
+            case "\"\"":
+            case "\'\'":
+                return PartType.Constant;
+            case "[]":
+                return PartType.Array;
+        }
+        return PartType.None;
+                                            
+    }
     void RepaceBreckets(ref string Line)
     {
         //Перенести в какйо-нибудь отдельный класс для пре-инициализации.
@@ -38,10 +53,10 @@ public class Core
         int CurrPointer = CurrentParsing.PartsColl.Count;
         
         Line =  ReplaceEmpty.Replace(Line,(Match m) => { 
-                                    string MValue = m.Value;
+                                    string MValue = m.Value.Trim("()[]".ToCharArray());
 
-                                    CurrentParsing.PartsColl.Add(new Part(
-                                        (m.Value == "()" ? PartType.Brackets: PartType.Constant),
+                                    CurrentParsing.PartsColl.Add(new Part( 
+                                        GetPartType(m.Value),
                                         MValue));
                                     return "#"+CurrPointer++; });
 
@@ -82,17 +97,17 @@ public class Core
             if(SourceCodeLines[i].Contains('#'))
                 continue;
 
-            SourceCodeLines[i] = SourceCodeLines[i].Replace("    ","\t").Trim();
+            SourceCodeLines[i] = SourceCodeLines[i].Replace("    ","\t");
             int TabsNum = SourceCodeLines[i].Count((ch) => ch == '\t');
             OutLines.Add(SourceCodeLines[i]);
             if(TabsNum > CurTabsNum)
             {
-                OutLines.Add(NodeTypes.START.ToString());
+                OutLines.Insert(i,NodeTypes.START.ToString());
                 Opened++;
             }
             else if(TabsNum < CurTabsNum)
             {
-                OutLines.Add(NodeTypes.END.ToString());
+                OutLines.Insert(i,NodeTypes.END.ToString());
                 Closed++;
             }
             CurTabsNum = TabsNum;

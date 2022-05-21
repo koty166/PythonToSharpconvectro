@@ -80,6 +80,7 @@ public class Node
             case NodeTypes.OPERATOR:
                 if(ChildNodes == null)
                     return "ERROR";
+                Target = PostGenerationReplacement.ReplaceLogicalOperators(Target);
                 if(!IsBrackets)
                     return ChildNodes[0].MyToString(Opt) + Target + ChildNodes[1].MyToString(Opt) + (IsBase?";":"");
                 else
@@ -101,10 +102,22 @@ public class Node
                      return "("+ParamRes.ToString()  + ")"+Target + (IsBase?";":"");
 
             case NodeTypes.ARRAY:
-                if(Target is null || ChildNodes is null || ChildNodes[0] is null)
+                if(Target == null || ChildNodes==null)
                     return "ERROR";
-                string ChildStr = ChildNodes[0].MyToString(Opt) .Replace(":","..").Replace("-","^");
-                return Target+"["+ChildStr + "]";
+
+                StringBuilder ArrValues = new StringBuilder(100);
+                foreach (var item in ChildNodes)
+                    ArrValues.Append(item.MyToString(Opt) + ", ");
+                ArrValues.Remove(ArrValues.Length-2,2);
+
+                string OutValue = ArrValues.ToString();
+
+                if(Target != string.Empty)
+                    return Target+"["+ArrValues.ToString() + "]";
+                else if(ChildNodes.Length > 0 && OutValue != string.Empty)
+                    return "new object[]"+" {"+OutValue + "}";
+                else
+                   return "new object[0]";
                 
             case NodeTypes.NVAR:
                 if(Target == null)
@@ -123,10 +136,10 @@ public class Node
                 return String.Empty;
 
             case NodeTypes.BREAK:
-                return "break";
+                return "break;";
 
             case NodeTypes.CONTINUE:
-                return "continue";
+                return "continue;";
             
 
 
