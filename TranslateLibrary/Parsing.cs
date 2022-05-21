@@ -14,13 +14,15 @@ public class Parse
     static string[] ImportantPreferenses = new string[] {"=","+=","-=","*=","/=","==",">=","<=","<",">"," and "," or ","+","-","*","/"," in ","."};
     static string[] EqualsPosibilities = new string[] {"=","+=","-=","*=","/="};
 
+    static string[] Keywords = new string[] {"true","false"};
     bool IsNewVar(string Target, Node ParentNode, NodeTypes ParentNodeType)
     {
         IEnumerable<MyVar> VarRes = from cur in Vars
                                     where cur.name == Target
                                     select cur;
         int VarSearchRes = VarRes.Count();
-        if(VarSearchRes == 0 && ((ParentNode.IsBase && ParentNodeType == NodeTypes.EQUALS) || ParentNode.Target == " in ") )
+        if(VarSearchRes == 0 && ((ParentNode.IsBase && ParentNodeType == NodeTypes.EQUALS) || ParentNode.Target == " in ")
+            && !Keywords.Contains(Target) )
             return true;
         else 
             return false;

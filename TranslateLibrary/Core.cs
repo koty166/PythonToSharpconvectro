@@ -61,7 +61,7 @@ public class Core
                                     return "#"+CurrPointer++; });
 
         Line = ReplaceNonEmptyQuotation.Replace(Line,(Match m) => { 
-                                    string MValue = m.Value;
+                                    string MValue = "\""+(m.Value.Trim("\'\"".ToArray())) + "\"";
 
                                     CurrentParsing.PartsColl.Add(new Part(
                                         PartType.Constant,
@@ -86,7 +86,8 @@ public class Core
 
                                     return "#"+CurrPointer++; });
     }
-    
+    string ReplaceSomeConsts(string Line) =>
+        Line.Replace("True","true").Replace("False","false");
     string[] Normalazing(string[] SourceCodeLines)
     {
         List<string> Lines = SourceCodeLines.ToList<string>();
@@ -94,6 +95,7 @@ public class Core
         int Opened = 0, Closed = 0;
         for (int i = 0; i < Lines.Count; i++)
         {
+            Lines[i] = ReplaceSomeConsts(Lines[i]);
             Lines[i] = Lines[i].Replace("    ","\t");
             int TabsNum = Lines[i].Count((ch) => ch == '\t');
             if(TabsNum > CurTabsNum)
