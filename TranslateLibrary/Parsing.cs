@@ -20,7 +20,7 @@ public class Parse
                                     where cur.name == Target
                                     select cur;
         int VarSearchRes = VarRes.Count();
-        if(VarSearchRes == 0 && ParentNode.IsBase && (ParentNodeType == NodeTypes.IN ||ParentNodeType == NodeTypes.EQUALS)) 
+        if(VarSearchRes == 0 && ((ParentNode.IsBase && ParentNodeType == NodeTypes.EQUALS) || ParentNode.Target == " in ") )
             return true;
         else 
             return false;
@@ -96,6 +96,7 @@ public class Parse
     {
         string NormalizedIfConstruction = Regex.Match(Line,@"(?<=if)[( ]?[\w\W]+[) ]?(?=:)").Value.Trim("() ".ToCharArray());
         Node CurNode =  new Node(NodeTypes.IF,ParentUID);
+        CurNode.Target = Regex.Match(Line,"if|elif|else").Value;
         Nodes.Add(CurNode.UID,CurNode);
         RootNodes.Add(CurNode);
         
@@ -106,6 +107,8 @@ public class Parse
     public Node ForConstructionSeparator(string Line,bool IsFor,int CurGlobalNDPos, Int64 ParentUID)
     {
         Node CurNode =  new Node(ParentUID);
+        CurNode.IsBase = true;
+
         Nodes.Add(CurNode.UID,CurNode);
         string NormalizedIfConstruction = String.Empty;
         if(IsFor)

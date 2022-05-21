@@ -166,9 +166,21 @@ public class Node
             case NodeTypes.IF:
                 if(ChildNodes == null)
                     return "ERROR";
-                if(ChildNodes[0].IsBrackets)
-                    return  "if" + ChildNodes[0].MyToString(Opt) ;
-                return  "if(" + ChildNodes[0].MyToString(Opt)  + ")";
+                switch(Target)
+                {
+                    case "if":
+                        if(ChildNodes[0].IsBrackets)
+                            return  "if" + ChildNodes[0].MyToString(Opt);
+                        return  "if" +"(" + ChildNodes[0].MyToString(Opt)  + ")";
+                    case "elif":
+                        if(ChildNodes[0].IsBrackets)
+                            return  "else if" + ChildNodes[0].MyToString(Opt);
+                        return  "else if" +"(" + ChildNodes[0].MyToString(Opt)  + ")";
+                    case "else":
+                        return "else";
+                }
+                return "ERROR";
+                
 
             case NodeTypes.IMPORT:
                 if(Target == null)

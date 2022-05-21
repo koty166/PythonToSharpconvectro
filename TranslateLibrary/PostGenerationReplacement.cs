@@ -2,6 +2,10 @@ namespace TranslateLibrary.CoreLib;
 
 internal class PostGenerationReplacement
 {
+    internal static string ConditionalСonstructsReplace(string Type)
+    {
+        return Type;
+    }
     internal static string PostGenerationOptimizing(string Type , PostGenerationOptimizingT Opt, out bool IsRight)
     {
         IsRight = true;

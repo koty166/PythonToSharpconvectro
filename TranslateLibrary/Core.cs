@@ -89,33 +89,30 @@ public class Core
     
     string[] Normalazing(string[] SourceCodeLines)
     {
-        List<string> OutLines = new List<string>();
+        List<string> Lines = SourceCodeLines.ToList<string>();
         int CurTabsNum = 0;
         int Opened = 0, Closed = 0;
-        for (int i = 0; i < SourceCodeLines.Length; i++)
+        for (int i = 0; i < Lines.Count; i++)
         {
-            if(SourceCodeLines[i].Contains('#'))
-                continue;
-
-            SourceCodeLines[i] = SourceCodeLines[i].Replace("    ","\t");
-            int TabsNum = SourceCodeLines[i].Count((ch) => ch == '\t');
-            OutLines.Add(SourceCodeLines[i]);
+            Lines[i] = Lines[i].Replace("    ","\t");
+            int TabsNum = Lines[i].Count((ch) => ch == '\t');
             if(TabsNum > CurTabsNum)
             {
-                OutLines.Insert(i,NodeTypes.START.ToString());
+                Lines.Insert(i,NodeTypes.START.ToString());
                 Opened++;
             }
             else if(TabsNum < CurTabsNum)
             {
-                OutLines.Insert(i,NodeTypes.END.ToString());
+                Lines.Insert(i,NodeTypes.END.ToString());
                 Closed++;
             }
             CurTabsNum = TabsNum;
-            
+            if(Lines[i].Contains('#'))
+                Lines.RemoveAt(i);
         }
         if(Opened - Closed == 1)
-            OutLines.Add(NodeTypes.END.ToString());
-        return OutLines.ToArray();
+            Lines.Add(NodeTypes.END.ToString());
+        return Lines.ToArray();
     }
    
     void GenNodes(string SourceCode)
@@ -127,7 +124,7 @@ public class Core
         {
             Lines[i] = Lines[i].Trim();
             RepaceBreckets(ref Lines[i]);
-            if(Lines[i].StartsWith("if"))
+            if(Lines[i].StartsWith("if") || Lines[i].StartsWith("elif") || Lines[i].StartsWith("else"))
             {
                 CurrentParsing.IfConstructionSeparator(Lines[i],i,i);
                 continue;
