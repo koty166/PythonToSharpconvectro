@@ -5,6 +5,11 @@ namespace TranslateLibrary.CoreLib;
 public class Parse
 {
 
+    public Parse()
+    {
+        RootNodes = new List<Node>();
+        PartsColl = new List<Part>();
+    }
     internal List<Node> RootNodes;
     internal List<Part> PartsColl;
 
@@ -33,24 +38,7 @@ public class Parse
         NodeTypes NodeType = NodeTypes.NONE;
         
         Node ParentNode = Nodes[ParNodeUID];
-        MatchCollection ArrMatches = Regex.Matches(Target,",?([\\d]+|[\"'][\\d\\s\\w]+[\"']|[\\d\\w]+),?");
-        if(Target.StartsWith('[') && Target.EndsWith(']'))
-        {
-            if(ArrMatches.Count == 0)
-                return NodeTypes.CONST;
-
-            CurrNode.NodeType = NodeTypes.ARRAY;
-            CurrNode.ChildNodes = new Node[ArrMatches.Count];
-            for (int i = 0; i < ArrMatches.Count; i++)
-            {
-                String BufValue = ArrMatches[i].Value.Trim(','); 
-                if(BufValue.StartsWith('\'') && BufValue.EndsWith('\'') || BufValue.StartsWith('\"') && BufValue.EndsWith('\"') || BufValue.All(ch => char.IsDigit(ch)))
-                    CurrNode.ChildNodes[i] = new Node(NodeTypes.CONST,BufValue);
-                else
-                    CurrNode.ChildNodes[i] = new Node(NodeTypes.VAR,BufValue);
-            }
-        }
-        else if(Regex.Matches(Target,"[\"'].*[\\d\\w]*.*[\"']").Count != 0 || Regex.Match(Target,@"\d+").Value == Target)
+        if(Regex.Matches(Target,"[\"'].*[\\d\\w]*.*[\"']").Count != 0 || Regex.Match(Target,@"\d+").Value == Target)
         {
             NodeType = NodeTypes.CONST;
         }

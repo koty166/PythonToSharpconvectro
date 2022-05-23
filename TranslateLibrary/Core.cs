@@ -11,18 +11,14 @@ namespace TranslateLibrary.CoreLib;
 public class Core
 {
 
-    /// <summary>
-    /// Основной метод трансляции кода. В обоих случаях сохраняется форматирование.
-    /// </summary>
-    /// <param name="SourceCode">Исходный код на Python</param>
-    /// <returns>Код на c#</returns>
-    public string Translate(object? SourceCode, PostGenerationOptimizingT Opt)
+    public Core()
     {
-        CurrentParsing = new Parse()
-                                {RootNodes = new List<Node>(),
-                                 PartsColl = new List<Part>()};
-        GenNodes(SourceCode as string);
-        string Resautl = CodeGenerator.GenCode(CurrentParsing.RootNodes.ToArray(),Opt);
+        CurrentParsing = new Parse();
+    }
+    public string Translate(string SourceCode)
+    {
+        GenNodes(SourceCode);
+        string Resautl = CodeGenerator.GenCode(CurrentParsing.RootNodes.ToArray());
         return Resautl;
     }
     Parse CurrentParsing;
@@ -44,7 +40,6 @@ public class Core
     }
     void RepaceBreckets(ref string Line)
     {
-        //Перенести в какйо-нибудь отдельный класс для пре-инициализации.
         Regex ReplaceEmpty = new Regex("(\"\")|(\'\')|(\\[\\])|(\\(\\))",RegexOptions.Compiled);
         Regex ReplaceNonEmptyQuotation = new Regex("(\"[^\"]+\")|('[^']+')",RegexOptions.Compiled);
         Regex ReplaceNonEmptyArrBrackets = new Regex(@"(\[[^\[\]]+\])",RegexOptions.Compiled);

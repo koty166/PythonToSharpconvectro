@@ -71,7 +71,7 @@ public class Node
     static Int64 GetUID() => new Random().NextInt64();
 
 
-    public string MyToString(PostGenerationOptimizingT Opt)
+    public override string ToString()
     {
         switch(this.NodeType)
         {
@@ -82,18 +82,18 @@ public class Node
                     return "ERROR";
                 Target = PostGenerationReplacement.ReplaceLogicalOperators(Target);
                 if(!IsBrackets)
-                    return ChildNodes[0].MyToString(Opt) + Target + ChildNodes[1].MyToString(Opt) + (IsBase?";":"");
+                    return ChildNodes[0].ToString() + Target + ChildNodes[1].ToString()  + (IsBase?";":"");
                 else
-                    return "("+ChildNodes[0].MyToString(Opt) + Target + ChildNodes[1].MyToString(Opt) +")" + (IsBase?";":"");
+                    return "("+ChildNodes[0].ToString()  + Target + ChildNodes[1].ToString()  +")" + (IsBase?";":"");
             case NodeTypes.CALL:
                 if(Target == null || ChildNodes==null)
                     return "ERROR";
 
-                Target = PostGenerationReplacement.PostGenerationOptimizing(Target,Opt, out bool IsRight);
+                Target = PostGenerationReplacement.PostGenerationOptimizing(Target, out bool IsRight);
                 
                 StringBuilder ParamRes = new StringBuilder(100);
                 foreach (var item in ChildNodes)
-                    ParamRes.Append(item.MyToString(Opt)  + ", ");
+                    ParamRes.Append(item.ToString()   + ", ");
                 ParamRes.Remove(ParamRes.Length-2,2);
                 
                 if(IsRight)
@@ -107,7 +107,7 @@ public class Node
 
                 StringBuilder ArrValues = new StringBuilder(100);
                 foreach (var item in ChildNodes)
-                    ArrValues.Append(item.MyToString(Opt) + ", ");
+                    ArrValues.Append(item.ToString()  + ", ");
                 ArrValues.Remove(ArrValues.Length-2,2);
 
                 string OutValue = ArrValues.ToString();
@@ -155,13 +155,13 @@ public class Node
                 if(ChildNodes == null)
                     return "ERROR";
 
-                return  "foreach(" + ChildNodes[0].MyToString(Opt)  + ")";
+                return  "foreach(" + ChildNodes[0].ToString()   + ")";
 
             case NodeTypes.WHILE:
                 if(ChildNodes == null)
                     return "ERROR";
 
-                return  "while(" + ChildNodes[0].MyToString(Opt)  + ")";
+                return  "while(" + ChildNodes[0].ToString()   + ")";
 
             case NodeTypes.IF:
                 if(ChildNodes == null)
@@ -170,12 +170,12 @@ public class Node
                 {
                     case "if":
                         if(ChildNodes[0].IsBrackets)
-                            return  "if" + ChildNodes[0].MyToString(Opt);
-                        return  "if" +"(" + ChildNodes[0].MyToString(Opt)  + ")";
+                            return  "if" + ChildNodes[0].ToString() ;
+                        return  "if" +"(" + ChildNodes[0].ToString()   + ")";
                     case "elif":
                         if(ChildNodes[0].IsBrackets)
-                            return  "else if" + ChildNodes[0].MyToString(Opt);
-                        return  "else if" +"(" + ChildNodes[0].MyToString(Opt)  + ")";
+                            return  "else if" + ChildNodes[0].ToString() ;
+                        return  "else if" +"(" + ChildNodes[0].ToString()   + ")";
                     case "else":
                         return "else";
                 }

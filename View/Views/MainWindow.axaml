@@ -7,7 +7,9 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Kyrs.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
-        Title="Транслятор кода">
+        Title="Транслятор кода"
+        Width = "1000" Height = "500"
+        MinWidth = "1000" MinHeight = "500">
 
     <Design.DataContext>
         <vm:MainWindowViewModel/>
@@ -56,14 +58,6 @@
         <Button x:Name="SourceClear" Content="Очистить" Classes="btn" Click="SourceClear_Click"  Margin="20,369,0,10" HorizontalAlignment="Left" VerticalAlignment = "Bottom"/>
         <Button x:Name="TargetClear" Content="Очистить" Classes="btn" Click="TargetClear_Click" Margin="0,369,20,10" HorizontalAlignment="Right" VerticalAlignment = "Bottom" />
         <!--________________________________________-->
-        <Menu Height="25" VerticalAlignment="Top">
-            <MenuItem Classes="MyMenuStyle" Header="Темы" Height="24" Width="70" HorizontalAlignment="Center" FontStyle="Normal" FontFamily="Algerian" FontWeight="Normal">
-                <Label x:Name="Dark" Content="Dark" FontFamily="Segoe UI Black" PointerPressed="Dark_Click"/>
-                <Label x:Name="Blue" Content="Blue" FontFamily="Segoe UI Black" PointerPressed="Blue_Click" />
-                <Label x:Name="White" Content="White" FontFamily="Segoe UI Black" PointerPressed="White_Click" />
-                <Label x:Name="Default" Content="Default" FontFamily="Segoe UI Black" PointerPressed="Default_Click" />
-            </MenuItem>
-        </Menu>
     </Grid>
 
 </Window>

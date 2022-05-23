@@ -1,13 +1,11 @@
-using System;
-using System.Threading;
-using TranslateLibrary;
+
 using TranslateLibrary.CoreLib;
 
 namespace TranslateLibrary.API;
 
 public static class API
 {
-    public static bool Translate(string TextToTranslate, PostGenerationOptimizingT Opt, out string TranslatedText, out string Error)
+    public static bool Translate(string TextToTranslate, out string TranslatedText, out string Error)
     {
         if(TextToTranslate is null || TextToTranslate.Trim() == string.Empty)
         {
@@ -15,19 +13,18 @@ public static class API
             TranslatedText = string.Empty;
             return false;
         }
-        //try
-        //{   
+        try
+        {   
             
-            TranslatedText = new Core().Translate(TextToTranslate as string, Opt);
+            TranslatedText = new Core().Translate(TextToTranslate as string);
             Error = String.Empty;
             return true;
-        //}
-        //catch(Exception ex)
-        //{
-            ///Error = ex.Message; 
-            Error = "";
+        }
+        catch(Exception ex)
+        {
+            Error = ex.Message; 
             TranslatedText  = String.Empty;
             return false;
-       // }
+        }
     }
 }
