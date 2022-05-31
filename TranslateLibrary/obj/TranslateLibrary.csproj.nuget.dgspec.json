@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/home/kot/Inf/avolonia/Kyrs/TranslateLibrary/TranslateLibrary.csproj": {}
+    "/home/koty/Inf/avolonia/Kyrs/TranslateLibrary/TranslateLibrary.csproj": {}
   },
   "projects": {
-    "/home/kot/Inf/avolonia/Kyrs/TranslateLibrary/TranslateLibrary.csproj": {
+    "/home/koty/Inf/avolonia/Kyrs/TranslateLibrary/TranslateLibrary.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/kot/Inf/avolonia/Kyrs/TranslateLibrary/TranslateLibrary.csproj",
+        "projectUniqueName": "/home/koty/Inf/avolonia/Kyrs/TranslateLibrary/TranslateLibrary.csproj",
         "projectName": "TranslateLibrary",
-        "projectPath": "/home/kot/Inf/avolonia/Kyrs/TranslateLibrary/TranslateLibrary.csproj",
-        "packagesPath": "/home/kot/.nuget/packages/",
-        "outputPath": "/home/kot/Inf/avolonia/Kyrs/TranslateLibrary/obj/",
+        "projectPath": "/home/koty/Inf/avolonia/Kyrs/TranslateLibrary/TranslateLibrary.csproj",
+        "packagesPath": "/home/koty/.nuget/packages/",
+        "outputPath": "/home/koty/Inf/avolonia/Kyrs/TranslateLibrary/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/kot/.nuget/NuGet/NuGet.Config"
+          "/home/koty/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
@@ -62,7 +62,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/home/kot/.dotnet/sdk/6.0.201/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/6.0.102/RuntimeIdentifierGraph.json"
         }
       }
     }

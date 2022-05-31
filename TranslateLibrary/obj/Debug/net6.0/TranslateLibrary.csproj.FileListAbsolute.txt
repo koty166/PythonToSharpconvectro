@@ -10,3 +10,15 @@
 /home/kot/Inf/avolonia/Kyrs/TranslateLibrary/obj/Debug/net6.0/refint/TranslateLibrary.dll
 /home/kot/Inf/avolonia/Kyrs/TranslateLibrary/obj/Debug/net6.0/TranslateLibrary.pdb
 /home/kot/Inf/avolonia/Kyrs/TranslateLibrary/obj/Debug/net6.0/ref/TranslateLibrary.dll
+/home/koty/Inf/avolonia/Kyrs/TranslateLibrary/bin/Debug/net6.0/TranslateLibrary.deps.json
+/home/koty/Inf/avolonia/Kyrs/TranslateLibrary/bin/Debug/net6.0/TranslateLibrary.dll
+/home/koty/Inf/avolonia/Kyrs/TranslateLibrary/bin/Debug/net6.0/ref/TranslateLibrary.dll
+/home/koty/Inf/avolonia/Kyrs/TranslateLibrary/bin/Debug/net6.0/TranslateLibrary.pdb
+/home/koty/Inf/avolonia/Kyrs/TranslateLibrary/obj/Debug/net6.0/TranslateLibrary.csproj.AssemblyReference.cache
+/home/koty/Inf/avolonia/Kyrs/TranslateLibrary/obj/Debug/net6.0/TranslateLibrary.GeneratedMSBuildEditorConfig.editorconfig
+/home/koty/Inf/avolonia/Kyrs/TranslateLibrary/obj/Debug/net6.0/TranslateLibrary.AssemblyInfoInputs.cache
+/home/koty/Inf/avolonia/Kyrs/TranslateLibrary/obj/Debug/net6.0/TranslateLibrary.AssemblyInfo.cs
+/home/koty/Inf/avolonia/Kyrs/TranslateLibrary/obj/Debug/net6.0/TranslateLibrary.csproj.CoreCompileInputs.cache
+/home/koty/Inf/avolonia/Kyrs/TranslateLibrary/obj/Debug/net6.0/TranslateLibrary.dll
+/home/koty/Inf/avolonia/Kyrs/TranslateLibrary/obj/Debug/net6.0/ref/TranslateLibrary.dll
+/home/koty/Inf/avolonia/Kyrs/TranslateLibrary/obj/Debug/net6.0/TranslateLibrary.pdb
