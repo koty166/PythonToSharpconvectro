@@ -47,7 +47,8 @@
                 "--project",
                 "${workspaceFolder}/View/Kyrs.csproj"
             ],
-            "problemMatcher": "$msCompile"
+            "problemMatcher": "$msCompile",
+            "isBackground": true
         }
     ]
 }

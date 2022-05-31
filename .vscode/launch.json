@@ -27,13 +27,6 @@
             "console": "internalConsole",
             "stopAtEntry": false
         }
-    ],
-    "compounds":
-    [
-        {
-                "name": "GUI/CLI",
-                "configurations": ["GUI", "CLI"]
-        }
     ]
     
 }

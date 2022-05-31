@@ -1,0 +1,12 @@
+/home/kot/Inf/avolonia/Kyrs/TranslateLibrary/bin/Realise/net6.0/TranslateLibrary.deps.json
+/home/kot/Inf/avolonia/Kyrs/TranslateLibrary/bin/Realise/net6.0/TranslateLibrary.dll
+/home/kot/Inf/avolonia/Kyrs/TranslateLibrary/bin/Realise/net6.0/TranslateLibrary.pdb
+/home/kot/Inf/avolonia/Kyrs/TranslateLibrary/obj/Realise/net6.0/TranslateLibrary.csproj.AssemblyReference.cache
+/home/kot/Inf/avolonia/Kyrs/TranslateLibrary/obj/Realise/net6.0/TranslateLibrary.GeneratedMSBuildEditorConfig.editorconfig
+/home/kot/Inf/avolonia/Kyrs/TranslateLibrary/obj/Realise/net6.0/TranslateLibrary.AssemblyInfoInputs.cache
+/home/kot/Inf/avolonia/Kyrs/TranslateLibrary/obj/Realise/net6.0/TranslateLibrary.AssemblyInfo.cs
+/home/kot/Inf/avolonia/Kyrs/TranslateLibrary/obj/Realise/net6.0/TranslateLibrary.csproj.CoreCompileInputs.cache
+/home/kot/Inf/avolonia/Kyrs/TranslateLibrary/obj/Realise/net6.0/TranslateLibrary.dll
+/home/kot/Inf/avolonia/Kyrs/TranslateLibrary/obj/Realise/net6.0/refint/TranslateLibrary.dll
+/home/kot/Inf/avolonia/Kyrs/TranslateLibrary/obj/Realise/net6.0/TranslateLibrary.pdb
+/home/kot/Inf/avolonia/Kyrs/TranslateLibrary/obj/Realise/net6.0/ref/TranslateLibrary.dll
