@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/koty/Inf/avolonia/Kyrs/TranslateLibrary/TranslateLibrary.csproj": {}
+    "/home/koty/Projects/PythonToSharpconvectro/TranslateLibrary/TranslateLibrary.csproj": {}
   },
   "projects": {
-    "/home/koty/Inf/avolonia/Kyrs/TranslateLibrary/TranslateLibrary.csproj": {
+    "/home/koty/Projects/PythonToSharpconvectro/TranslateLibrary/TranslateLibrary.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/koty/Inf/avolonia/Kyrs/TranslateLibrary/TranslateLibrary.csproj",
+        "projectUniqueName": "/home/koty/Projects/PythonToSharpconvectro/TranslateLibrary/TranslateLibrary.csproj",
         "projectName": "TranslateLibrary",
-        "projectPath": "/home/koty/Inf/avolonia/Kyrs/TranslateLibrary/TranslateLibrary.csproj",
+        "projectPath": "/home/koty/Projects/PythonToSharpconvectro/TranslateLibrary/TranslateLibrary.csproj",
         "packagesPath": "/home/koty/.nuget/packages/",
-        "outputPath": "/home/koty/Inf/avolonia/Kyrs/TranslateLibrary/obj/",
+        "outputPath": "/home/koty/Projects/PythonToSharpconvectro/TranslateLibrary/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/koty/.nuget/NuGet/NuGet.Config"
@@ -53,16 +53,23 @@
             "net47",
             "net471",
             "net472",
-            "net48"
+            "net48",
+            "net481"
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[6.0.29, 6.0.29]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/6.0.102/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.104/RuntimeIdentifierGraph.json"
         }
       }
     }

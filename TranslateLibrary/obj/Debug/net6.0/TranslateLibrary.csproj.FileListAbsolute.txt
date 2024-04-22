@@ -22,3 +22,16 @@
 /home/koty/Inf/avolonia/Kyrs/TranslateLibrary/obj/Debug/net6.0/TranslateLibrary.dll
 /home/koty/Inf/avolonia/Kyrs/TranslateLibrary/obj/Debug/net6.0/ref/TranslateLibrary.dll
 /home/koty/Inf/avolonia/Kyrs/TranslateLibrary/obj/Debug/net6.0/TranslateLibrary.pdb
+/home/koty/Projects/PythonToSharpconvectro/TranslateLibrary/bin/Debug/net6.0/TranslateLibrary.deps.json
+/home/koty/Projects/PythonToSharpconvectro/TranslateLibrary/bin/Debug/net6.0/TranslateLibrary.dll
+/home/koty/Projects/PythonToSharpconvectro/TranslateLibrary/bin/Debug/net6.0/TranslateLibrary.pdb
+/home/koty/Projects/PythonToSharpconvectro/TranslateLibrary/obj/Debug/net6.0/TranslateLibrary.csproj.AssemblyReference.cache
+/home/koty/Projects/PythonToSharpconvectro/TranslateLibrary/obj/Debug/net6.0/TranslateLibrary.GeneratedMSBuildEditorConfig.editorconfig
+/home/koty/Projects/PythonToSharpconvectro/TranslateLibrary/obj/Debug/net6.0/TranslateLibrary.AssemblyInfoInputs.cache
+/home/koty/Projects/PythonToSharpconvectro/TranslateLibrary/obj/Debug/net6.0/TranslateLibrary.AssemblyInfo.cs
+/home/koty/Projects/PythonToSharpconvectro/TranslateLibrary/obj/Debug/net6.0/TranslateLibrary.csproj.CoreCompileInputs.cache
+/home/koty/Projects/PythonToSharpconvectro/TranslateLibrary/obj/Debug/net6.0/TranslateLibrary.sourcelink.json
+/home/koty/Projects/PythonToSharpconvectro/TranslateLibrary/obj/Debug/net6.0/TranslateLibrary.dll
+/home/koty/Projects/PythonToSharpconvectro/TranslateLibrary/obj/Debug/net6.0/refint/TranslateLibrary.dll
+/home/koty/Projects/PythonToSharpconvectro/TranslateLibrary/obj/Debug/net6.0/TranslateLibrary.pdb
+/home/koty/Projects/PythonToSharpconvectro/TranslateLibrary/obj/Debug/net6.0/ref/TranslateLibrary.dll

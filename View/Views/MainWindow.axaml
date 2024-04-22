@@ -52,7 +52,7 @@
         
 
         <Label x:Name="LS" Content="Исходный код на Python" Margin="20,30,512,369" HorizontalContentAlignment="Left"/>
-        <Label x:Name="LT" Content="Целевой код на C#" Margin="0,30,20,369" HorizontalContentAlignment="Right"/>
+        <Label x:Name="LT" Content="Блок-схема" Margin="0,30,20,369" HorizontalContentAlignment="Right"/>
         <!--Кнопки управления-->
         <Button x:Name="Translate" Content="Транслировать" Classes="btn" Click="Translate_Click" Margin="342,368,342,10" HorizontalAlignment="Center" VerticalAlignment = "Bottom"/>  
         <Button x:Name="SourceClear" Content="Очистить" Classes="btn" Click="SourceClear_Click"  Margin="20,369,0,10" HorizontalAlignment="Left" VerticalAlignment = "Bottom"/>
