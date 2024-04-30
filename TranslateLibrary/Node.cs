@@ -1,4 +1,5 @@
 
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -15,6 +16,8 @@ public class Node
     public Node[]? ChildNodes;
     public bool IsBrackets;
     public bool IsBase;
+
+    public static Dictionary<string,string> Vars = new Dictionary<string, string>();
     public Node()
     {
         ChildNodes = null;
@@ -67,43 +70,84 @@ public class Node
         UID = _UID;
         Target = _Target;
     }
-
+    public static bool Check(Node Node)
+    {   
+        if(Node.NodeType == NodeTypes.OPERATOR && (Node.ChildNodes[0].NodeType == NodeTypes.NONE || Node.ChildNodes[0].NodeType == NodeTypes.NONE ))
+            throw new ParsingException("Некорректное применение оператора " + Node.Target);
+        return true;
+    }
     static Int64 GetUID() => new Random().NextInt64();
-
 
     public override string ToString()
     {
-        switch(this.NodeType)
+        return Target;
+    }
+    public static double Calculate(string left, string right, string oper)
+    {
+        double dleft = double.Parse(left) , dright = double.Parse(right);
+        return oper.Trim() switch
+        {
+            "+" => dleft + dright,
+            "-" => dleft - dright,
+            "/" => dleft / dright,
+            "*" => dleft * dright,
+            "**" => Math.Pow(dleft,dright),
+            _ => throw new NotImplementedException(),
+        };
+    }
+    public string Calculate()
+    {
+         switch(this.NodeType)
         {
             case NodeTypes.EQUALS:
-            case NodeTypes.IN:
-            case NodeTypes.OPERATOR:
+                Check(this);
                 if(ChildNodes == null)
-                    return "ERROR";
-                Target = PostGenerationReplacement.ReplaceLogicalOperators(Target);
-                if(!IsBrackets)
-                    return ChildNodes[0].ToString() + Target + ChildNodes[1].ToString()  + (IsBase?";":"");
-                else
-                    return "("+ChildNodes[0].ToString()  + Target + ChildNodes[1].ToString()  +")" + (IsBase?";":"");
-            case NodeTypes.CALL:
-                if(Target == null || ChildNodes==null)
-                    return "ERROR";
+                    throw new AnalyzeException("Нет дочерних элементов");
+                string LeftRes = ChildNodes[0].ToString(),RightRes = ChildNodes[1].Calculate();
+                Node.Vars[LeftRes] = RightRes; 
+                return  LeftRes+ " = " +RightRes ;
+                
+            case NodeTypes.OPERATOR:
 
-                Target = PostGenerationReplacement.PostGenerationOptimizing(Target, out bool IsRight);
+                Check(this);
+                if(ChildNodes == null)
+                    throw new AnalyzeException("Нет дочерних элементов");
+
+                if(Target == "==")
+                {
+                    return double.Parse(ChildNodes[0].Calculate()) == double.Parse(ChildNodes[1].Calculate()) ? "TRUE" : "FALSE";
+                }
+                else if(Target == ">")
+                {
+                    return double.Parse(ChildNodes[0].Calculate()) > double.Parse(ChildNodes[1].Calculate()) ? "TRUE" : "FALSE";
+                }
+                else if(Target == "<")
+                {
+                    return double.Parse(ChildNodes[0].Calculate()) < double.Parse(ChildNodes[1].Calculate()) ? "TRUE" : "FALSE";
+                }
+
+                string res;
+
+                try{ res = Node.Calculate(ChildNodes[0].Calculate(),ChildNodes[1].Calculate(),Target).ToString();}
+                catch { res =  $"{ChildNodes[0].Calculate()} {Target} {ChildNodes[1].Calculate()}"; }
+                
+                return res;
+            case NodeTypes.CALL:
+                Check(this);
+                if(Target == null || ChildNodes==null)
+                    throw new AnalyzeException("Нет дочерних элементов");
                 
                 StringBuilder ParamRes = new StringBuilder(100);
                 foreach (var item in ChildNodes)
-                    ParamRes.Append(item.ToString()   + ", ");
+                    ParamRes.Append(item.Calculate()   + ", ");
                 ParamRes.Remove(ParamRes.Length-2,2);
                 
-                if(IsRight)
-                    return Target+"("+ParamRes.ToString()  + ")" + (IsBase?";":"");
-                else
-                     return "("+ParamRes.ToString()  + ")"+Target + (IsBase?";":"");
+                return $"Вызов функции {Target} с аргументами ({ParamRes})";
 
             case NodeTypes.ARRAY:
+                Check(this);
                 if(Target == null || ChildNodes==null)
-                    return "ERROR";
+                   throw new AnalyzeException("Объявлен пустой массив");
 
                 StringBuilder ArrValues = new StringBuilder(100);
                 foreach (var item in ChildNodes)
@@ -115,22 +159,24 @@ public class Node
                 if(Target != string.Empty)
                     return Target+"["+ArrValues.ToString() + "]";
                 else if(ChildNodes.Length > 0 && OutValue != string.Empty)
-                    return "new object[]"+" {"+OutValue + "}";
+                    return $"[{OutValue}]";
                 else
-                   return "new object[0]";
+                   throw new AnalyzeException("Объявлен пустой массив");
                 
             case NodeTypes.NVAR:
+                Check(this);
                 if(Target == null)
-                    return "ERROR";
-                    
-                return "dynamic "+Target;
+                    throw new AnalyzeException("Нет дочерних элементов");
+                Node.Vars.Add(Target,"0");
+                return Target;
 
             case NodeTypes.VAR:
+                Check(this);
+                if(!Node.Vars.ContainsKey(Target))
+                    throw new AnalyzeException("Неизвестная переменная " + Target);
+                return Node.Vars[Target];
             case NodeTypes.CONST:
-                if(!IsBrackets)
-                    return Target;
-                else
-                    return "("+Target +")";
+                return Target;
 
             case NodeTypes.NONE:
                 return String.Empty;
@@ -144,7 +190,7 @@ public class Node
 
 
             case NodeTypes.END:
-                return "}";
+                return "CONTINUE";
 
             case NodeTypes.START:
                 return "{";
@@ -153,55 +199,40 @@ public class Node
 
             case NodeTypes.FOR:
                 if(ChildNodes == null)
-                    return "ERROR";
+                    throw new AnalyzeException("Нет дочерних элементов");
 
                 return  "foreach(" + ChildNodes[0].ToString()   + ")";
 
             case NodeTypes.WHILE:
                 if(ChildNodes == null)
-                    return "ERROR";
+                    throw new AnalyzeException("Нет дочерних элементов");
 
                 return  "while(" + ChildNodes[0].ToString()   + ")";
 
             case NodeTypes.IF:
                 if(ChildNodes == null)
-                    return "ERROR";
-                switch(Target)
-                {
-                    case "if":
-                        if(ChildNodes[0].IsBrackets)
-                            return  "if" + ChildNodes[0].ToString() ;
-                        return  "if" +"(" + ChildNodes[0].ToString()   + ")";
-                    case "elif":
-                        if(ChildNodes[0].IsBrackets)
-                            return  "else if" + ChildNodes[0].ToString() ;
-                        return  "else if" +"(" + ChildNodes[0].ToString()   + ")";
-                    case "else":
-                        return "else";
-                }
-                return "ERROR";
-                
+                    throw new AnalyzeException("Нет дочерних элементов");
+
+                if(ChildNodes[0].Calculate() == "FALSE")
+                    return "SKIP";
+                return "CONTINUE";
 
             case NodeTypes.IMPORT:
+                Check(this);
                 if(Target == null)
-                    return "ERROR";
+                    throw new AnalyzeException("Нет дочерних элементов");
                 string LibName = String.Empty;
                 if(Target.Contains(" as "))
-                    LibName = Regex.Split(Target," as ")[1] + " = ";
+                    LibName = Regex.Split(Target," as ")[1] + " как ";
                 if(Target.StartsWith("import")) 
                 { 
-                    LibName = LibName + Target.Split(' ')[1];
+                    LibName += Target.Split(' ')[1];
                 } 
-                else if(Target.StartsWith("from"))
-                {
-                    LibName = String.Empty;
-                    LibName = "static " + LibName + Target.Split(' ')[1];
-                }
 
-                return "using "+LibName+";";
+                return $"Импортирована библиотека {LibName}";
 
             default:
-            return "ERROR";
+            throw new AnalyzeException("Нет дочерних элементов");
         }
     }
 }

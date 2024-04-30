@@ -1,4 +1,6 @@
+using System.Reflection.PortableExecutable;
 using System.Text.RegularExpressions;
+using IronPython.Runtime.Operations;
 
 namespace TranslateLibrary.CoreLib;
 
@@ -16,7 +18,7 @@ public class Parse
     Dictionary<Int64,Node> Nodes = new Dictionary<long, Node>();
     List<MyVar> Vars = new List<MyVar>();
    
-    static string[] ImportantPreferenses = new string[] {"=","+=","-=","*=","/=","==",">=","<=","<",">"," and "," or ","+","-","*","/"," in ","."};
+    static string[] ImportantPreferenses = new string[] {"=","+=","-=","*=","/=","==",">=","<=","<",">"," and "," or ","**","+","-","*","/"};
     static string[] EqualsPosibilities = new string[] {"=","+=","-=","*=","/="};
 
     static string[] Keywords = new string[] {"true","false"};
@@ -32,60 +34,51 @@ public class Parse
         else 
             return false;
     }
+    bool IsVar(string Target) =>
+        Regex.Matches(Target,@"([A-Za-zА-Яа-я_]+\d*)+").Count == 1 && Regex.Matches(Target,@"([A-Za-zА-Яа-я_]+\d*)+")[0].Value == Target;
 
     NodeTypes GetNodeType(ref string Target, long ParNodeUID, Node CurrNode)
     {
-        NodeTypes NodeType = NodeTypes.NONE;
-        
         Node ParentNode = Nodes[ParNodeUID];
-        if(Regex.Matches(Target,"[\"'].*[\\d\\w]*.*[\"']").Count != 0 || Regex.Match(Target,@"\d+").Value == Target)
+        if(Regex.Matches(Target,"[\"'].*[\\d\\w]*.*[\"']").Count != 0 || Regex.Match(Target,@"[\d\.]+").Value == Target)
         {
-            NodeType = NodeTypes.CONST;
+            return NodeTypes.CONST;
         }
-        else if(IsNewVar(Target,ParentNode, ParentNode.NodeType))
+        if (IsVar(Target))
         {
-            NodeType = NodeTypes.NVAR;
-            Vars.Add(new MyVar(){name = Target}); 
+            if(IsNewVar(Target,ParentNode, ParentNode.NodeType))
+            {
+                Vars.Add(new MyVar(){name = Target}); 
+                return NodeTypes.NVAR;
+            }
+            else
+                return NodeTypes.VAR;
         }
         else
-            NodeType = NodeTypes.VAR;
-        return NodeType;
+            throw new ParsingException("Не удалось распознать имя переменной, функции или команды из строки " + Target);
     }
 
     static string[] Split(String s,out string? RSeparator)
     {
-        Regex r = new Regex(@"[=*\/+-.]+| in | and | or ");
 
-        string[] SubStrings =  r.Split(s);
-        if(SubStrings.Length <= 1)
+        foreach (var i in ImportantPreferenses)
         {
-            RSeparator = null;
-            return new string[]{s};
+            string[] SubStrings =  s.Split(i,2);
+
+            if(SubStrings.Length == 2)
+            {   
+                RSeparator = i;
+                return SubStrings;
+            }
         }
-        MatchCollection Separators = r.Matches(s);
-        int MostImportantSeparator = GetMostImportantMatchNumber(Separators);
-
-        RSeparator = Separators[MostImportantSeparator].Value;
-
-        string LeftRes = s.Substring(0,Separators[MostImportantSeparator].Index);
-        string RightRes = s.Substring(Separators[MostImportantSeparator].Index + Separators[MostImportantSeparator].Length);
-
-
-        return new string[] {LeftRes,RightRes};
-    }
-    static int GetMostImportantMatchNumber(MatchCollection mc)
-    {
-        foreach (var item in ImportantPreferenses)
-            for (int i = 0; i < mc.Count; i++)
-                if(mc[i].Value == item)
-                    return i;
-        return 0;
+        RSeparator = null;
+        return new string[]{s};
     }
 
     public Node IfConstructionSeparator(string Line,int CurGlobalNDPos, Int64 ParentUID)
     {
         string NormalizedIfConstruction = Regex.Match(Line,@"(?<=if)[( ]?[\w\W]+[) ]?(?=:)").Value.Trim("() ".ToCharArray());
-        Node CurNode =  new Node(NodeTypes.IF,ParentUID);
+        Node CurNode = new Node(NodeTypes.IF,ParentUID);
         CurNode.Target = Regex.Match(Line,"if|elif|else").Value;
         Nodes.Add(CurNode.UID,CurNode);
         RootNodes.Add(CurNode);
@@ -94,33 +87,11 @@ public class Parse
         CurNode.ChildNodes[0] = SeparateLinear(NormalizedIfConstruction,CurGlobalNDPos,CurNode.UID,false,false);
         return CurNode;
     }
-    public Node ForConstructionSeparator(string Line,bool IsFor,int CurGlobalNDPos, Int64 ParentUID)
-    {
-        Node CurNode =  new Node(ParentUID);
-        CurNode.IsBase = true;
-
-        Nodes.Add(CurNode.UID,CurNode);
-        string NormalizedIfConstruction = String.Empty;
-        if(IsFor)
-        {
-            NormalizedIfConstruction = Regex.Match(Line,@"(?<=for)[( ]?[\w\W]+[) ]?(?=:)").Value.Trim("() ".ToCharArray());
-            CurNode.NodeType = NodeTypes.FOR;
-        }
-        else
-        {
-            NormalizedIfConstruction = Regex.Match(Line,@"(?<=while)[( ]?[\w\W]+[) ]?(?=:)").Value.Trim("() ".ToCharArray());
-            CurNode.NodeType = NodeTypes.WHILE;
-        }
-        CurNode.ChildNodes = new Node[1];
-        CurNode.ChildNodes[0] = SeparateLinear(NormalizedIfConstruction,CurGlobalNDPos,CurNode.UID,false,false);
-        RootNodes.Add(CurNode);
-
-        return CurNode;
-    }
     public Node SeparateLinear(string Line,int CurGlobalNDPos, Int64 ParentUID, bool IsBrackets, bool IsBase)
     {   
-        if(Line == String.Empty || Line == "()")
+        if(Line == String.Empty)
             return new Node(NodeTypes.NONE);
+
 
         string[] Sublines = Split(Line,out string? RSeparator);
         Node CurNode = new Node(ParentUID) {IsBrackets = IsBrackets, IsBase = IsBase};
@@ -141,7 +112,17 @@ public class Parse
             }
             else if(CurrPart.Type == PartType.Array)
             {
-                string[] ArrItems = PartsColl[BracketCollIndex].Target.Split(',',StringSplitOptions.TrimEntries);
+                string[] ArrItems = PartsColl[BracketCollIndex].Target.Split(',');
+                if(ArrItems.Any((t) => t == String.Empty))
+                    throw new ParsingException($"Массив {Sublines[0]} содержит пустые строки");
+                foreach (var item in ArrItems)
+                {
+                    if(item == String.Empty)
+                        throw new ParsingException($"Массив {Sublines[0]} содержит пустые строки");
+                    else if(item.Contains('#') && !item.startswith("#"))
+                        throw new ParsingException("Некорректный набор массива. Вероятно пропущена запятая в строке " +item.split("#").First().ToString()+PartsColl[int.Parse(item.split("#").Last().ToString())].Target);
+                }
+
                 CurNode.NodeType = NodeTypes.ARRAY;
                 CurNode.ChildNodes = new Node[ArrItems.Length];
 
@@ -192,6 +173,9 @@ public class Parse
 
                 for (int i = 0; i < Params.Length; i++)
                     CurNode.ChildNodes[i] = SeparateLinear(Params[i].Trim(),CurGlobalNDPos,CurNode.UID,false,false);
+                
+                if(CurNode.NodeType == NodeTypes.CALL && CurNode.ChildNodes.Any((n) => n.NodeType == NodeTypes.OPERATOR && (n.Target == ">" || n.Target == "<" || n.Target == "==")))
+                    throw new ParsingException("Недопустимо использование логических операторов в вызове функции " + CurNode.Target);
                 return CurNode;
             }
             CurNode.ChildNodes = null;

@@ -13,18 +13,9 @@ public static class API
             TranslatedText = string.Empty;
             return false;
         }
-        try
-        {   
-            
-            TranslatedText = new Core().Translate(TextToTranslate as string);
-            Error = String.Empty;
-            return true;
-        }
-        catch(Exception ex)
-        {
-            Error = ex.Message; 
-            TranslatedText  = String.Empty;
-            return false;
-        }
+        TranslatedText = new Core().Translate(TextToTranslate);
+        Error = String.Empty;
+        return true;
+
     }
 }

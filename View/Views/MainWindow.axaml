@@ -20,7 +20,7 @@
       <StyleInclude Source="/Styles/TextBox.xaml"/>
     </Window.Styles>
 
-    <Grid x:Name="GR">
+    <Grid x:Name="GR" ShowGridLines="True">
         <Grid.Background>
             <LinearGradientBrush EndPoint="50%,100%" StartPoint="50%,0%">
                 <GradientStop Color="#FF9DC797" Offset="0"/>
@@ -30,33 +30,41 @@
 
          <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition></RowDefinition>
-            <RowDefinition></RowDefinition>
+            <RowDefinition Height="70*"></RowDefinition>
+            <RowDefinition Height="30*"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition></ColumnDefinition>
             <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
         
-        <TextBox x:Name="TBSource" 
+        <TextBox
+             x:Name="TBSource" 
             Grid.Row = "0" Grid.Column="0" 
-            Grid.RowSpan="2"
             FontSize="16" FontFamily="Arial"
-            Classes="MyTBStyleStandart" Margin="20,70,70,70"  HorizontalAlignment="Stretch" TextWrapping="NoWrap" Text="" AcceptsReturn="True" AcceptsTab="True" />
+            Classes="MyTBStyleStandart" Margin="20,70,20,20"  HorizontalAlignment="Stretch" TextWrapping="NoWrap" Text="" AcceptsReturn="True" AcceptsTab="True" />
         <TextBox x:Name="TBTarget"
             Grid.Row = "0" Grid.Column="1"
-            Grid.RowSpan="2" 
             FontSize="16" FontFamily="Arial"
+            IsReadOnly="True"
+            Classes="MyTBStyleStandart" Margin="20,70,20,20" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Text=""  AcceptsReturn="True" AcceptsTab="True" />
+        <TextBox x:Name="TBResult"
+            Grid.Row = "1" Grid.Column="0"
+            Grid.ColumnSpan="2"
+            FontSize="16" FontFamily="Arial"
+            IsReadOnly="True"
             Classes="MyTBStyleStandart" Margin="70,70,20,70" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Text=""  AcceptsReturn="True" AcceptsTab="True" />
+        <Label x:Name="LR" Content="Результат операций" Grid.Row = "1" Grid.Column="0"
+            Grid.ColumnSpan="2" Margin="20,20,20,20" HorizontalAlignment="Center"/>
     </Grid>
+
         
 
-        <Label x:Name="LS" Content="Исходный код на Python" Margin="20,30,512,369" HorizontalContentAlignment="Left"/>
-        <Label x:Name="LT" Content="Блок-схема" Margin="0,30,20,369" HorizontalContentAlignment="Right"/>
+        <Label x:Name="LS" Content="Исходный код" Margin="20,30,512,369" HorizontalAlignment="Left"/>
+        <Label x:Name="LT" Content="БКС форма" Margin="0,30,20,369" HorizontalAlignment="Right"/>
         <!--Кнопки управления-->
-        <Button x:Name="Translate" Content="Транслировать" Classes="btn" Click="Translate_Click" Margin="342,368,342,10" HorizontalAlignment="Center" VerticalAlignment = "Bottom"/>  
+        <Button x:Name="Translate" Content="Вычислить" Classes="btn" Click="Translate_Click" Margin="342,368,342,10" HorizontalAlignment="Center" VerticalAlignment = "Bottom"/>  
         <Button x:Name="SourceClear" Content="Очистить" Classes="btn" Click="SourceClear_Click"  Margin="20,369,0,10" HorizontalAlignment="Left" VerticalAlignment = "Bottom"/>
-        <Button x:Name="TargetClear" Content="Очистить" Classes="btn" Click="TargetClear_Click" Margin="0,369,20,10" HorizontalAlignment="Right" VerticalAlignment = "Bottom" />
         <!--________________________________________-->
     </Grid>
 

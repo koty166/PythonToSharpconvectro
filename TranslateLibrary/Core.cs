@@ -1,7 +1,4 @@
-﻿using IronPython.Hosting;
-using IronPython;
-using IronPython.Modules;
-using Microsoft.Scripting.Hosting;
+﻿using Microsoft.Scripting.Hosting;
 
 using System.Diagnostics;
 using System.Text.RegularExpressions;
@@ -18,7 +15,7 @@ public class Core
     public string Translate(string SourceCode)
     {
         GenNodes(SourceCode);
-        string Resautl = CodeGenerator.GenCode(CurrentParsing.RootNodes.ToArray());
+        string Resautl = CodeGenerator.GenReport(CurrentParsing.RootNodes.ToArray());
         return Resautl;
     }
     Parse CurrentParsing;
@@ -40,12 +37,13 @@ public class Core
     }
     void RepaceBreckets(ref string Line)
     {
-        Regex ReplaceEmpty = new Regex("(\"\")|(\'\')|(\\[\\])|(\\(\\))",RegexOptions.Compiled);
-        Regex ReplaceNonEmptyQuotation = new Regex("(\"[^\"]+\")|('[^']+')",RegexOptions.Compiled);
-        Regex ReplaceNonEmptyArrBrackets = new Regex(@"(\[[^\[\]]+\])",RegexOptions.Compiled);
-        Regex ReplaceNonEmptyBrackets = new Regex(@"\(([^()]+\))",RegexOptions.Compiled);
+        Regex ReplaceEmpty = new("(\"\")|(\'\')|(\\[\\])|(\\(\\))",RegexOptions.Compiled);
+        Regex ReplaceNonEmptyQuotation = new("(\"[^\"]+\")|('[^']+')",RegexOptions.Compiled);
+        Regex ReplaceNonEmptyArrBrackets = new(@"(\[[^\[\]]+\])",RegexOptions.Compiled);
+        Regex ReplaceNonEmptyBrackets = new(@"\(([^()]+\))",RegexOptions.Compiled);
         
         int CurrPointer = CurrentParsing.PartsColl.Count;
+        
         
         Line =  ReplaceEmpty.Replace(Line,(Match m) => { 
                                     string MValue = m.Value.Trim("()[]".ToCharArray());
@@ -71,7 +69,7 @@ public class Core
                                         MValue.Trim("[]".ToCharArray())));
                                          
                                     return "#"+CurrPointer++; });
-
+while(Line.Contains(")")||Line.Contains("()")){
         Line = ReplaceNonEmptyBrackets.Replace(Line,(Match m) => { 
                                     string MValue = m.Value;
 
@@ -80,6 +78,7 @@ public class Core
                                         MValue.Trim("()".ToCharArray())));
 
                                     return "#"+CurrPointer++; });
+        }
     }
     string ReplaceSomeConsts(string Line) =>
         Line.Replace("True","true").Replace("False","false");
@@ -92,23 +91,12 @@ public class Core
         {
             Lines[i] = ReplaceSomeConsts(Lines[i]);
             Lines[i] = Lines[i].Replace("    ","\t");
-            int TabsNum = Lines[i].Count((ch) => ch == '\t');
-            if(TabsNum > CurTabsNum)
-            {
-                Lines.Insert(i,NodeTypes.START.ToString());
-                Opened++;
-            }
-            else if(TabsNum < CurTabsNum)
-            {
-                Lines.Insert(i,NodeTypes.END.ToString());
-                Closed++;
-            }
-            CurTabsNum = TabsNum;
+            Lines[i] = Lines[i].Trim();
+            if(!Lines[i].StartsWith("import")) Lines[i] = Lines[i].Replace(" ","");
+            if(Lines[i] == "end") Lines[i] = NodeTypes.END.ToString();
             if(Lines[i].Contains('#'))
                 Lines.RemoveAt(i);
         }
-        if(Opened - Closed == 1)
-            Lines.Add(NodeTypes.END.ToString());
         return Lines.ToArray();
     }
    
@@ -121,24 +109,28 @@ public class Core
         {
             Lines[i] = Lines[i].Trim();
             RepaceBreckets(ref Lines[i]);
-            if(Lines[i].StartsWith("if") || Lines[i].StartsWith("elif") || Lines[i].StartsWith("else"))
+            if(Lines[i].Contains(')') || Lines[i].Contains('(') || Lines[i].Contains('[') || Lines[i].Contains(']') )
+                throw new ParsingException("Неверная скобочная последовательность в строке " + Lines[i]);
+            else if(Lines[i].Contains('"'))
+                throw new ParsingException("Некорректное завершение текста в строке " + Lines[i]);
+            else if(Lines[i].Contains('\''))
+                throw new ParsingException("Недопустимый символ ' в строке " + Lines[i]);
+            else if(Lines[i].StartsWith("="))
+                throw new ParsingException("Отсутствует переменная в строке " + Lines[i]);
+            else if(Lines[i].EndsWith("="))
+                throw new ParsingException("Отсутствует правая часть " + Lines[i]);
+            if(Lines[i].StartsWith("if"))
             {
+                if(!Lines[i].EndsWith(":"))
+                    throw new ParsingException("Отсутствует знак \":\" в строке " + Lines[i]);
                 CurrentParsing.IfConstructionSeparator(Lines[i],i,i);
                 continue;
             }
-            else if(Lines[i].StartsWith("for"))
+            else if(Lines[i].StartsWith("import"))
             {
-                CurrentParsing.ForConstructionSeparator(Lines[i],true,i,i);
-                continue;
-            }
-            else if(Lines[i].StartsWith("while"))
-            {
-                CurrentParsing.ForConstructionSeparator(Lines[i],false,i,i);
-                continue;
-            }
-            else if(Lines[i].StartsWith("import") || Lines[i].StartsWith("from"))
-            {
-               CurrentParsing.RootNodes.Add(new Node(NodeTypes.IMPORT){Target = Lines[i]});
+                if(!Lines[i].Contains("as"))
+                    throw new ParsingException("Отсутствует ключевое слово \"as\" в строке " + Lines[i]);
+                CurrentParsing.RootNodes.Add(new Node(NodeTypes.IMPORT){Target = Lines[i]});
                 continue;
             }
             switch(Lines[i])
@@ -148,12 +140,6 @@ public class Core
                     break;
                 case "END":
                    CurrentParsing.RootNodes.Add(new Node(NodeTypes.END));
-                    break;
-                case "continue":
-                   CurrentParsing.RootNodes.Add(new Node(NodeTypes.CONTINUE));
-                    break;
-                case "break":
-                   CurrentParsing.RootNodes.Add(new Node(NodeTypes.BREAK));
                     break;
                 default:
                     CurrentParsing.SeparateLinear(Lines[i],i,i,false,true);
