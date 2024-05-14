@@ -1,33 +1,22 @@
-<Window x:Name="window"
-        xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Kyrs.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Kyrs.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="Транслятор кода"
-        Width = "1000" Height = "500"
-        MinWidth = "1000" MinHeight = "500">
+         RequestedThemeVariant="Light"
+        Title="View">
 
     <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 
-    <Window.Styles>
-      <StyleInclude Source="/Styles/Button.xaml"/>
-      <StyleInclude Source="/Styles/TextBox.xaml"/>
-    </Window.Styles>
-
     <Grid x:Name="GR" ShowGridLines="True">
-        <Grid.Background>
-            <LinearGradientBrush EndPoint="50%,100%" StartPoint="50%,0%">
-                <GradientStop Color="#FF9DC797" Offset="0"/>
-                <GradientStop Color="#FFE09898" Offset="1"/>
-            </LinearGradientBrush>
-        </Grid.Background>
-
          <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="70*"></RowDefinition>
@@ -39,32 +28,37 @@
         </Grid.ColumnDefinitions>
         
         <TextBox
-             x:Name="TBSource" 
+            Name="TBSource" GotFocus="Refresh"
             Grid.Row = "0" Grid.Column="0" 
             FontSize="16" FontFamily="Arial"
-            Classes="MyTBStyleStandart" Margin="20,70,20,20"  HorizontalAlignment="Stretch" TextWrapping="NoWrap" Text="" AcceptsReturn="True" AcceptsTab="True" />
-        <TextBox x:Name="TBTarget"
+            Margin="20,70,20,20"  HorizontalAlignment="Stretch" TextWrapping="NoWrap" Text="" AcceptsReturn="True" AcceptsTab="True" />
+        <TextBlock
+            Name="TBLSource" 
+            Grid.Row = "0" Grid.Column="0" 
+            FontSize="16" FontFamily="Arial"
+            Margin="31,77,20,20"  HorizontalAlignment="Stretch" />
+        <TextBox Name="TBTarget"
             Grid.Row = "0" Grid.Column="1"
             FontSize="16" FontFamily="Arial"
             IsReadOnly="True"
-            Classes="MyTBStyleStandart" Margin="20,70,20,20" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Text=""  AcceptsReturn="True" AcceptsTab="True" />
-        <TextBox x:Name="TBResult"
+             Margin="20,70,20,20" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Text=""  AcceptsReturn="True" AcceptsTab="True" />
+        <TextBox Name="TBResult"
             Grid.Row = "1" Grid.Column="0"
             Grid.ColumnSpan="2"
             FontSize="16" FontFamily="Arial"
             IsReadOnly="True"
-            Classes="MyTBStyleStandart" Margin="70,70,20,70" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Text=""  AcceptsReturn="True" AcceptsTab="True" />
-        <Label x:Name="LR" Content="Результат операций" Grid.Row = "1" Grid.Column="0"
+             Margin="70,70,20,70" HorizontalAlignment="Stretch" TextWrapping="NoWrap" Text=""  AcceptsReturn="True" AcceptsTab="True" />
+        <Label Name="LR" Content="Результат операций" Grid.Row = "1" Grid.Column="0"
             Grid.ColumnSpan="2" Margin="20,20,20,20" HorizontalAlignment="Center"/>
     </Grid>
 
         
 
-        <Label x:Name="LS" Content="Исходный код" Margin="20,30,512,369" HorizontalAlignment="Left"/>
-        <Label x:Name="LT" Content="БКС форма" Margin="0,30,20,369" HorizontalAlignment="Right"/>
+        <Label Name="LS" Content="Исходный код" Margin="20,30,512,369" HorizontalAlignment="Left"/>
+        <Label Name="LT" Content="БКС форма" Margin="0,30,20,369" HorizontalAlignment="Right"/>
         <!--Кнопки управления-->
-        <Button x:Name="Translate" Content="Вычислить" Classes="btn" Click="Translate_Click" Margin="342,368,342,10" HorizontalAlignment="Center" VerticalAlignment = "Bottom"/>  
-        <Button x:Name="SourceClear" Content="Очистить" Classes="btn" Click="SourceClear_Click"  Margin="20,369,0,10" HorizontalAlignment="Left" VerticalAlignment = "Bottom"/>
+        <Button Name="Translate" Content="Вычислить"  Click="Translate_Click" Margin="342,368,342,10" HorizontalAlignment="Center" VerticalAlignment = "Bottom"/>  
+        <Button Name="SourceClear" Content="Очистить"  Click="SourceClear_Click"  Margin="20,369,0,10" HorizontalAlignment="Left" VerticalAlignment = "Bottom"/>
         <!--________________________________________-->
     </Grid>
 

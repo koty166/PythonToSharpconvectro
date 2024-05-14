@@ -1,4 +1,5 @@
-﻿using Microsoft.Scripting.Hosting;
+﻿using IronPython.Runtime.Operations;
+using Microsoft.Scripting.Hosting;
 
 using System.Diagnostics;
 using System.Text.RegularExpressions;
@@ -35,7 +36,7 @@ public class Core
         return PartType.None;
                                             
     }
-    void RepaceBreckets(ref string Line)
+    void RepaceBreckets(ref string Line,string srcline)
     {
         Regex ReplaceEmpty = new("(\"\")|(\'\')|(\\[\\])|(\\(\\))",RegexOptions.Compiled);
         Regex ReplaceNonEmptyQuotation = new("(\"[^\"]+\")|('[^']+')",RegexOptions.Compiled);
@@ -69,7 +70,8 @@ public class Core
                                         MValue.Trim("[]".ToCharArray())));
                                          
                                     return "#"+CurrPointer++; });
-while(Line.Contains(")")||Line.Contains("()")){
+                                    int k = 0;
+while(Line.Contains(")")||Line.Contains("(")){
         Line = ReplaceNonEmptyBrackets.Replace(Line,(Match m) => { 
                                     string MValue = m.Value;
 
@@ -78,6 +80,8 @@ while(Line.Contains(")")||Line.Contains("()")){
                                         MValue.Trim("()".ToCharArray())));
 
                                     return "#"+CurrPointer++; });
+                                    k++;
+                                    if(k > 100) throw new ParsingException("Неверная скобочная последовательность в строке ", srcline,null);
         }
     }
     string ReplaceSomeConsts(string Line) =>
@@ -92,10 +96,9 @@ while(Line.Contains(")")||Line.Contains("()")){
             Lines[i] = ReplaceSomeConsts(Lines[i]);
             Lines[i] = Lines[i].Replace("    ","\t");
             Lines[i] = Lines[i].Trim();
-            if(!Lines[i].StartsWith("import")) Lines[i] = Lines[i].Replace(" ","");
+            //if(!Lines[i].StartsWith("import")) Lines[i] = Lines[i].Replace(" ","");
             if(Lines[i] == "end") Lines[i] = NodeTypes.END.ToString();
-            if(Lines[i].Contains('#'))
-                Lines.RemoveAt(i);
+
         }
         return Lines.ToArray();
     }
@@ -103,46 +106,141 @@ while(Line.Contains(")")||Line.Contains("()")){
     void GenNodes(string SourceCode)
     {
         string[] Lines = SourceCode.Split("\n",StringSplitOptions.RemoveEmptyEntries);
+        string[] SrcLines = Lines;
         Lines = Normalazing(Lines);
+        Regex Digits = new("[0-9]+\\ [0-9]+",RegexOptions.Compiled);
+
+        
 
         for (int i = 0; i < Lines.Length; i++)
         {
             Lines[i] = Lines[i].Trim();
-            RepaceBreckets(ref Lines[i]);
-            if(Lines[i].Contains(')') || Lines[i].Contains('(') || Lines[i].Contains('[') || Lines[i].Contains(']') )
-                throw new ParsingException("Неверная скобочная последовательность в строке " + Lines[i]);
-            else if(Lines[i].Contains('"'))
-                throw new ParsingException("Некорректное завершение текста в строке " + Lines[i]);
-            else if(Lines[i].Contains('\''))
-                throw new ParsingException("Недопустимый символ ' в строке " + Lines[i]);
-            else if(Lines[i].StartsWith("="))
-                throw new ParsingException("Отсутствует переменная в строке " + Lines[i]);
-            else if(Lines[i].EndsWith("="))
-                throw new ParsingException("Отсутствует правая часть " + Lines[i]);
+            if(Lines[i].EndsWith("+"))
+                throw new ParsingException("Синтаксическая ошиибка. Оператор + на конце строки" , SrcLines[i],"+");
+            else if(Lines[i].EndsWith("-"))
+                throw new ParsingException("Синтаксическая ошиибка. Оператор - на конце строки" , SrcLines[i],"-");
+            else if(Lines[i].EndsWith("**"))
+                throw new ParsingException("Синтаксическая ошиибка. Оператор ** на конце строки" , SrcLines[i],"**");
+            else if(Lines[i].EndsWith("/"))
+                throw new ParsingException("Синтаксическая ошиибка. Оператор / на конце строки" , SrcLines[i],"/");
+            else if(Lines[i].EndsWith("*"))
+                throw new ParsingException("Синтаксическая ошиибка. Оператор * на конце строки" , SrcLines[i],"*");
+
+            else if(Lines[i].Contains("++"))
+                throw new ParsingException("Синтаксическая ошиибка. Два оператора подряд ++" , SrcLines[i],"++");
+            else if(Lines[i].Contains("--"))
+                throw new ParsingException("Синтаксическая ошиибка. Два оператора подряд --" , SrcLines[i],"--");
+            else if(Lines[i].Contains("****"))
+                throw new ParsingException("Синтаксическая ошиибка. Два оператора подряд ** **" , SrcLines[i],"****");
+            else if(Lines[i].Contains("//"))
+                throw new ParsingException("Синтаксическая ошиибка. Два оператора подряд //" , SrcLines[i],"//");
+
+            else if(Lines[i].Contains("+-"))
+                throw new ParsingException("Синтаксическая ошиибка. Два оператора подряд +-" , SrcLines[i],"+-");
+            else if(Lines[i].Contains("-+"))
+                throw new ParsingException("Синтаксическая ошиибка. Два оператора подряд -+" , SrcLines[i],"-+");
+            else if(Lines[i].Contains("+/"))
+                throw new ParsingException("Синтаксическая ошиибка. Два оператора подряд +/" , SrcLines[i],"+/");
+            else if(Lines[i].Contains("/+"))
+                throw new ParsingException("Синтаксическая ошиибка. Два оператора подряд /+" , SrcLines[i],"/+");
+
+            else if(Lines[i].Contains("+**"))
+                throw new ParsingException("Синтаксическая ошиибка. Два оператора подряд +**" , SrcLines[i],"+**");
+            else if(Lines[i].Contains("**+"))
+                throw new ParsingException("Синтаксическая ошиибка. Два оператора подряд **+" , SrcLines[i],"**+");
+            else if(Lines[i].Contains("+*"))
+                throw new ParsingException("Синтаксическая ошиибка. Два оператора подряд +*" , SrcLines[i],"+*");
+            else if(Lines[i].Contains("*+"))
+                throw new ParsingException("Синтаксическая ошиибка. Два оператора подряд *+" , SrcLines[i],"*+");
+            
+            
+
+
+            else if(Lines[i].Contains("**-"))
+                throw new ParsingException("Синтаксическая ошиибка. Два оператора подряд **-" , SrcLines[i],"**-");
+            else if(Lines[i].Contains("-**"))
+                throw new ParsingException("Синтаксическая ошиибка. Два оператора подряд -**" , SrcLines[i],"-**");
+
+            else if(Lines[i].Contains("/-"))
+                throw new ParsingException("Синтаксическая ошиибка. Два оператора подряд -" , SrcLines[i],"/-");
+            else if(Lines[i].Contains("-/"))
+                throw new ParsingException("Синтаксическая ошиибка. Два оператора подряд -/" , SrcLines[i],"-/");
+            else if(Lines[i].Contains("-*"))
+                throw new ParsingException("Синтаксическая ошиибка. Два оператора подряд -*" , SrcLines[i],"-*");
+            else if(Lines[i].Contains("*-"))
+                throw new ParsingException("Синтаксическая ошиибка. Два оператора подряд *-" , SrcLines[i],"*-");
+
+            else if(Lines[i].Contains("**/"))
+                throw new ParsingException("Синтаксическая ошиибка. Два оператора подряд **/" , SrcLines[i],"**/");
+            else if(Lines[i].Contains("/**"))
+                throw new ParsingException("Синтаксическая ошиибка. Два оператора подряд /**" , SrcLines[i],"/**");
+                
+            else if(Lines[i].Contains("/*"))
+                throw new ParsingException("Синтаксическая ошиибка. Два оператора подряд /*" , SrcLines[i],"/*");
+            else if(Lines[i].Contains("*/"))
+                throw new ParsingException("Синтаксическая ошиибка. Два оператора подряд */" , SrcLines[i],"*/");
+
+            else if(Lines[i].Contains("***"))
+                throw new ParsingException("Синтаксическая ошиибка. Два оператора подряд ***" , SrcLines[i],"****");
+
+
+
+            else if(Lines[i].Contains(",]"))
+                throw new ParsingException("Ошибка: Запятая не может быть перед квадратной скобкой" , SrcLines[i],"]");
+            else if(Lines[i].Contains("[,"))
+                throw new ParsingException("Ошибка: Запятая не может быть перед квадратной скобкой" , SrcLines[i],"[");
+
+
+            bool IsFound = Digits.Match(Lines[i]).Success;
+            if(IsFound)
+                throw new ParsingException($"Ошибка. Два числа идут подряд", SrcLines[i],Digits.Match(Lines[i]).Value);
+
             if(Lines[i].StartsWith("if"))
             {
+                int pos = Lines[i].find("=");
+                if(pos != -1 && Lines[i][pos+1]!='=')
+                    throw new ParsingException("Недопустимый знак = в условии" , SrcLines[i],"=");
+            }
+
+            RepaceBreckets(ref Lines[i],SrcLines[i]);
+            if(Lines[i].Contains(')') || Lines[i].Contains('(') || Lines[i].Contains('[') || Lines[i].Contains(']') )
+                throw new ParsingException("Неверная скобочная последовательность в строке ", SrcLines[i],Regex.Match(Lines[i],"\\(|\\)|\\[|\\]").Value);
+            else if(Lines[i].Contains('"'))
+                throw new ParsingException("Некорректное завершение текста в строке " , SrcLines[i],"\"");
+            else if(Lines[i].Contains('\''))
+                throw new ParsingException("Недопустимый символ ' в строке " , SrcLines[i],"\'");
+            else if(Lines[i].StartsWith("="))
+                throw new ParsingException("Отсутствует переменная в строке " , SrcLines[i],null);
+            else if(Lines[i].EndsWith("="))
+                throw new ParsingException("Отсутствует правая часть " , SrcLines[i],null);
+            
+
+            
+
+            if(Lines[i].StartsWith("if"))
+            {   
                 if(!Lines[i].EndsWith(":"))
-                    throw new ParsingException("Отсутствует знак \":\" в строке " + Lines[i]);
-                CurrentParsing.IfConstructionSeparator(Lines[i],i,i);
+                    throw new ParsingException("Отсутствует знак \":\" в строке " , SrcLines[i],null);
+                CurrentParsing.IfConstructionSeparator(Lines[i],i,i,SrcLines[i]);
                 continue;
             }
             else if(Lines[i].StartsWith("import"))
             {
                 if(!Lines[i].Contains("as"))
-                    throw new ParsingException("Отсутствует ключевое слово \"as\" в строке " + Lines[i]);
-                CurrentParsing.RootNodes.Add(new Node(NodeTypes.IMPORT){Target = Lines[i]});
+                    throw new ParsingException("Отсутствует ключевое слово \"as\" в строке " , SrcLines[i],null);
+                CurrentParsing.RootNodes.Add(new Node(NodeTypes.IMPORT){Target = Lines[i],SrcLine = SrcLines[i]});
                 continue;
             }
             switch(Lines[i])
             {
                 case "START":
-                   CurrentParsing.RootNodes.Add(new Node(NodeTypes.START));
+                   CurrentParsing.RootNodes.Add(new Node(NodeTypes.START){SrcLine = SrcLines[i]});
                     break;
                 case "END":
-                   CurrentParsing.RootNodes.Add(new Node(NodeTypes.END));
+                   CurrentParsing.RootNodes.Add(new Node(NodeTypes.END){SrcLine = SrcLines[i]});
                     break;
                 default:
-                    CurrentParsing.SeparateLinear(Lines[i],i,i,false,true);
+                    CurrentParsing.SeparateLinear(Lines[i],i,i,false,true,SrcLines[i]);
                     break;
             }            
         }
